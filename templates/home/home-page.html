@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+        .upload-container {
+            background-color: #fff;
+            border: 2px dashed #d3d3d3;
+            border-radius: 10px;
+            width: 50%;
+            max-width: 600px;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .upload-container.dragging {
+            border-color: #6c63ff;
+        }
+        .upload-icon {
+            font-size: 50px;
+            color: #6c63ff;
+            margin-bottom: 10px;
+        }
+        .upload-text {
+            font-size: 18px;
+            color: #6c63ff;
+            margin-bottom: 5px;
+        }
+        .upload-link {
+            color: #6c63ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .upload-link:hover {
+            text-decoration: underline;
+        }
+        .upload-button {
+            display: block;
+            width: 100%;
+            max-width: 200px;
+            margin: 20px auto 0;
+            padding: 10px 0;
+            background-color: #6c63ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .upload-button:hover {
+            background-color: #5751d9;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-list {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="upload-container" id="uploadContainer">
+    <div class="upload-icon">📁</div>
+    <div class="upload-text">Drag & drop files or <a href="#" class="upload-link" id="browseLink">Browse</a></div>
+    <div class="upload-formats">Supported formats: PDF</div>
+    <div class="file-list" id="fileList"></div>
+    <input type="file" id="fileInput" accept=".pdf" multiple>
+    <button class="upload-button" id="uploadButton">Upload Files</button>
+</div>
+
+<script>
+    const uploadContainer = document.getElementById('uploadContainer');
+    const fileInput = document.getElementById('fileInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const fileList = document.getElementById('fileList');
+
+    document.getElementById('browseLink').addEventListener('click', function(event) {
+        event.preventDefault();
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length > 0) {
+            updateFileList();
+            // alert('Files ready for upload: ' + Array.from(fileInput.files).map(file => file.name).join(', '));
+        }
+    });
+
+    uploadButton.addEventListener('click', function() {
+        const formData = new FormData();
+        if (fileInput.files.length > 0) {
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('files', fileInput.files[i]);
+            }
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.text())
+              .then(result => alert(result))
+              .catch(error => console.error('Error:', error));
+        } else {
+            alert('Please select files first.');
+        }
+    });
+
+    uploadContainer.addEventListener('dragover', function(event) {
+        event.preventDefault();
+        uploadContainer.classList.add('dragging');
+    });
+
+    uploadContainer.addEventListener('dragleave', function() {
+        uploadContainer.classList.remove('dragging');
+    });
+
+    uploadContainer.addEventListener('drop', function(event) {
+        event.preventDefault();
+        uploadContainer.classList.remove('dragging');
+        fileInput.files = event.dataTransfer.files;
+        updateFileList();
+        // alert('Files ready for upload: ' + Array.from(fileInput.files).map(file => file.name).join(', '));
+    });
+
+    function updateFileList() {
+        const files = Array.from(fileInput.files).map(file => file.name);
+        const fileListText = files.map(name => name.length > 30 ? name.substring(0, 27) + '...' : name).join(', ');
+        fileList.textContent = 'Files ready for upload: ' + fileListText;
+    }
+</script>
+
+</body>
+</html>
