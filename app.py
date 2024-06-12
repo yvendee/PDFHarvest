@@ -1,4 +1,4 @@
-from flask import Flask, request, Blueprint, render_template, redirect, url_for
+from flask import Flask, request, Blueprint, render_template, jsonify
 import os
 
 app = Flask(__name__)
@@ -17,22 +17,37 @@ def calendar():
 @app.route('/upload', methods=['POST'])
 def upload_files():
     if 'files' not in request.files:
-        return 'No files part in the request', 400
+        return jsonify({'error': 'No files part in the request'}), 400
     files = request.files.getlist('files')
     if not files:
-        return 'No files selected for uploading', 400
+        return jsonify({'error': 'No files selected for uploading'}), 400
+    
+    uploaded_files = []
     for file in files:
         if file and file.filename:
             filename = file.filename
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return 'Files successfully uploaded', 200
+            fullpath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(fullpath)
+            # uploaded_files.append(filename)
+            uploaded_files.append(fullpath)
+    print(uploaded_files)
 
-@app.before_request
-def log_request_info():
-    print(f'Request URL: {request.url}')
-    print(f'Request Method: {request.method}')
-    print(f'Request Headers: {request.headers}')
-    print(f'Request Body: {request.get_data()}')
+
+    
+    response = {
+        'message': 'Files successfully uploaded'
+        # 'files': uploaded_files
+    }
+    return jsonify(response), 200
+
+
+# @app.before_request
+# def log_request_info():
+#     print(f'Request URL: {request.url}')
+#     print(f'Request Method: {request.method}')
+#     print(f'Request Headers: {request.headers}')
+#     print(f'Request Body: {request.get_data()}')
+
 
 @app.route('/sendData', methods=['POST'])
 def log_post_request():
