@@ -108,6 +108,13 @@ def download_files(session_id):
 
     return send_file(zip_filepath, as_attachment=True)
 
+# @app.before_request
+# def log_request_info():
+#     print(f'Request URL: {request.url}')
+#     print(f'Request Method: {request.method}')
+#     print(f'Request Headers: {request.headers}')
+#     print(f'Request Body: {request.get_data()}')
+
 
 @app.route('/sendData', methods=['POST'])
 def log_post_request():
