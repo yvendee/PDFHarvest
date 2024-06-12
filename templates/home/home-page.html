@@ -66,9 +66,9 @@
             display: none;
         }
         .file-list {
-            margin-top: 10px;
             font-size: 14px;
             color: #333;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -95,10 +95,7 @@
     });
 
     fileInput.addEventListener('change', function() {
-        if (fileInput.files.length > 0) {
-            updateFileList();
-            // alert('Files ready for upload: ' + Array.from(fileInput.files).map(file => file.name).join(', '));
-        }
+        updateFileList();
     });
 
     uploadButton.addEventListener('click', function() {
@@ -112,11 +109,10 @@
                 body: formData
             }).then(response => response.json())
               .then(result => {
-                  if (result.error) {
-                      alert('Error: ' + result.error);
+                  if (result.session_id) {
+                      window.location.href = `/status?session_id=${result.session_id}`;
                   } else {
-                    //   alert(result.message + '\nFiles: ' + result.files.join(', '));
-                      alert(result.message);
+                      alert(result.message || 'An error occurred');
                   }
               })
               .catch(error => console.error('Error:', error));
@@ -139,16 +135,15 @@
         uploadContainer.classList.remove('dragging');
         fileInput.files = event.dataTransfer.files;
         updateFileList();
-        // alert('Files ready for upload: ' + Array.from(fileInput.files).map(file => file.name).join(', '));
     });
 
     function updateFileList() {
-        const files = Array.from(fileInput.files).map(file => file.name);
-        const fileListText = files.map(name => name.length > 30 ? name.substring(0, 27) + '...' : name).join(', ');
-        fileList.textContent = 'Files ready for upload: ' + fileListText;
+        const files = fileInput.files;
+        const fileNames = Array.from(files).map(file => file.name);
+        const truncatedFileNames = fileNames.map(name => name.length > 30 ? name.slice(0, 30) + '...' : name);
+        fileList.textContent = truncatedFileNames.join(', ');
     }
 </script>
-
 
 </body>
 </html>

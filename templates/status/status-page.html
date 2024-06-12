@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+        .status-container {
+            background-color: #fff;
+            border: 2px solid #d3d3d3;
+            border-radius: 10px;
+            width: 50%;
+            max-width: 600px;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .hidden {
+            display: none;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<button class="back-button" onclick="goBack()">Back</button>
+
+<div class="status-container">
+    <h2>Status:</h2>
+    <p id="progressText">Please wait...</p>
+    <p>Working on file <span id="fileNumber">0</span> of <span id="totalFiles">0</span> (<span id="percentageComplete">0</span>% Complete)</p>
+    <button id="downloadButton" class="hidden">Download</button>
+</div>
+
+<script>
+    function goBack() {
+        window.location.href = '/'; // Redirect to home.html
+    }
+
+    function updateProgress(sessionId) {
+        fetch(`/progress/${sessionId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    const { current, total } = data;
+                    const percentageComplete = Math.floor((current / total) * 100);
+                    document.getElementById('fileNumber').textContent = current;
+                    document.getElementById('totalFiles').textContent = total;
+                    document.getElementById('percentageComplete').textContent = percentageComplete;
+                    if (current < total) {
+                        setTimeout(() => updateProgress(sessionId), 1000);
+                    } else {
+                        document.getElementById('downloadButton').classList.remove('hidden');
+                        document.getElementById('progressText').textContent = ''; // Remove "Please wait..." text
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve session ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        if (sessionId) {
+            // Start processing the files
+            fetch(`/process/${sessionId}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message === 'Processing started') {
+                        updateProgress(sessionId);
+                    } else {
+                        console.error(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+            document.getElementById('downloadButton').addEventListener('click', function() {
+                window.location.href = `/download/${sessionId}`;
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
