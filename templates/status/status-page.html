@@ -38,6 +38,18 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .download-button {
+            background-color: #ff00ff; /* Bright purple background */
+            color: white; /* White text */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            padding: 10px 20px; /* Padding for the button */
+            cursor: pointer; /* Pointer cursor on hover */
+            font-size: 16px; /* Increase font size */
+        }
+        .download-button:hover {
+            background-color: #cc00cc; /* Darker purple on hover */
+        }
     </style>
 </head>
 <body>
@@ -48,7 +60,7 @@
     <h2>Status:</h2>
     <p id="progressText">Please wait...</p>
     <p>Working on file <span id="fileNumber">0</span> of <span id="totalFiles">0</span> (<span id="percentageComplete">0</span>% Complete)</p>
-    <button id="downloadButton" class="hidden">Download</button>
+    <button id="downloadButton" class="download-button hidden">Download</button>
 </div>
 
 <script>
