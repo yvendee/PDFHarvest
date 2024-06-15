@@ -4,6 +4,14 @@ import time
 from threading import Thread
 import zipfile
 
+# import os
+import io
+import fitz  # PyMuPDF
+import cv2
+import numpy as np
+from PIL import Image
+
+
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Needed for session management
 
@@ -16,6 +24,62 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
 
 progress = {}
+
+
+####### Image Extraction #######
+# Function to extract images with faces from a specific PDF file
+def extract_images_with_faces(pdf_path):
+    # Get the base name of the PDF file
+    pdf_basename = os.path.splitext(os.path.basename(pdf_path))[0]
+    # Create the main folder if it doesn't exist
+    main_folder = "extracted_images"
+    if not os.path.exists(main_folder):
+        os.makedirs(main_folder)
+    # Create the images folder with the PDF base name inside the main folder
+    images_folder = os.path.join(main_folder, f"{pdf_basename}_extracted")
+    if not os.path.exists(images_folder):
+        os.makedirs(images_folder)
+
+    extracted_images = []
+
+    pdf_document = fitz.open(pdf_path)
+
+    # Extract images from the first page only
+    page_number = 0
+    page = pdf_document[page_number]
+    image_list = page.get_images(full=True)
+    face_found = False  # Flag to track if a face has been found on the first page
+    for image_index, img in enumerate(image_list):
+        xref = img[0]
+        base_image = pdf_document.extract_image(xref)
+        image_bytes = base_image["image"]
+        image_pil = Image.open(io.BytesIO(image_bytes))
+        image_cv2 = cv2.cvtColor(cv2.cvtColor(np.array(image_pil), cv2.COLOR_RGB2BGR), cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(image_cv2, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        if len(faces) > 0 and not face_found:
+            # If a face is detected and no face has been found yet on the first page
+            face_found = True
+            # Save the image in the images folder with a fixed name "image.jpg"
+            image_pil.save(os.path.join(images_folder, "image.jpg"), "JPEG")
+            extracted_images.append(image_pil)
+            break  # Stop processing further images on the first page once a face is found
+
+    pdf_document.close()
+
+    return extracted_images
+
+# Load the pre-trained face detection classifier
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+# Function to process a specific PDF file in the "uploads" folder
+def process_pdf_extract_image(filename):
+    pdf_path = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(pdf_path) and pdf_path.endswith(".pdf"):
+        extracted_images = extract_images_with_faces(pdf_path)
+        print(f"Processed {pdf_path}: {len(extracted_images)} images extracted with faces")
+    else:
+        print(f"File '{filename}' not found or is not a PDF.")
+
 
 @app.route('/')
 @app.route('/home')
@@ -70,6 +134,7 @@ def process_files(session_id):
         for index, filename in enumerate(uploaded_files):
             # Simulate processing of each file
             time.sleep(3)  # Simulate processing delay
+            process_pdf_extract_image(filename)
             progress[session_id]['current'] = index + 1
 
     if session_id not in progress:
