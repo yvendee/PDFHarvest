@@ -109,7 +109,18 @@
                 .catch(error => console.error('Error:', error));
 
             document.getElementById('downloadButton').addEventListener('click', function() {
+                // Trigger download of .zip file
                 window.location.href = `/download/${sessionId}`;
+                
+                // After a delay, trigger download of output.csv
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = `/download-csv/${sessionId}`;
+                    link.download = 'output.csv';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, 1000); // Delay in milliseconds
             });
         }
     });

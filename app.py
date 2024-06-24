@@ -4,6 +4,7 @@ import time
 from threading import Thread
 import zipfile
 import shutil
+import re
 
 # import os
 import io
@@ -11,26 +12,33 @@ import fitz  # PyMuPDF
 import cv2
 import numpy as np
 from PIL import Image
+from flask_cors import CORS
+from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_text )
+from custom_prompt.utils.utils import read_custom_prompt
+from csv_functions.utils.utils import save_csv
 
-
-app = Flask(__name__)
+# Build app
+app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
+CORS(app)
 app.secret_key = 'your_secret_key'  # Needed for session management
 
-apps = Blueprint('apps', __name__, template_folder='templates', static_folder='static')
 
 # Ensure the 'uploads' directory exists
 UPLOAD_FOLDER = 'uploads'
 EXTRACTED_PROFILE_PICTURE_FOLDER = 'extracted_images'
 EXTRACTED_PAGE_IMAGES_FOLDER = 'output_pdf2images'
+GENERATE_CSV_FOLDER = 'output_csv'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(EXTRACTED_PROFILE_PICTURE_FOLDER, exist_ok=True)
 os.makedirs(EXTRACTED_PAGE_IMAGES_FOLDER, exist_ok=True)
+os.makedirs(GENERATE_CSV_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['EXTRACTED_PROFILE_PICTURE_FOLDER'] = EXTRACTED_PROFILE_PICTURE_FOLDER
 app.config['EXTRACTED_PAGE_IMAGES_FOLDER'] = EXTRACTED_PAGE_IMAGES_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
 
 progress = {}
+
 
 ####### PDF to Images Extraction ################
 def pdf_to_jpg(pdf_file, output_folder, zoom=2):
@@ -47,6 +55,10 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     
     # List to store the filenames of the images for each page
     page_images = []
+
+    # String to store the summary for each page
+    total_summary = ""
+    test_summary = ""
     
     # Iterate through each page of the PDF
     for page_num in range(len(pdf_document)):
@@ -64,13 +76,85 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         image_filename = os.path.join(subfolder, f"page_{page_num + 1}.jpg")
         img.save(image_filename, "JPEG")
         page_images.append(image_filename)
-        print(f"Page {page_num + 1} of {pdf_file} saved as {image_filename}")
+        # print(f"Page {page_num + 1} of {pdf_file} saved as {image_filename}")
+
+        summary = get_summary_from_image(image_filename)
+        total_summary += summary + "\n"  # Add newline between summaries
     
     # Close the PDF file
     pdf_document.close()
-    
+
+    # Call the function to read and print the content of custom_prompt.txt
+    custom_prompt = read_custom_prompt("dynamic/txt/custom_prompt.txt")
+
+    pattern = r'\[(.*?)\]'
+    matches_list = re.findall(pattern, custom_prompt)
+    # print(matches_list)
+
+    # Initialize summary_dict based on matches_list
+    summary_dict = {match: "" for match in matches_list}
+    # print(summary_dict)
+
+
+    if custom_prompt not in ["Not Found", "Read Error"]:
+
+        total_summary += custom_prompt + "\n"
+
+        summary_text = get_summary_from_text(total_summary)
+
+        # summary_text = """
+        # - [Name]: Tacac Annie Magtortor
+        # - [Date of Birth]: May 27, 1981
+        # - [Age]: 42
+        # - [Place of Birth]: LupaGan Clarin Misam
+        # - [Weight]: 50 kg
+        # - [Height]: 150 cm
+        # - [Nationality]: Filipino
+        # - [Residential Address in Home Country]: Ilagan Isabela
+        # - [Repatriation Port/Airport]: Cauayan City
+        # - [Religion]: Catholic
+        # - [Education Level]: High School (10-12 years)
+        # - [Number of Siblings]: 4
+        # - [Marital Status]: Married
+        # - [Number of Children]: 1
+        # """
+
+        # Extracting values and updating summary_dict
+        pattern = r'\[(.*?)\]:\s*(.*)'
+        matches = re.findall(pattern, summary_text)
+
+        for key, value in matches:
+            if key in summary_dict:
+                summary_dict[key] = value.strip()
+
+        # Print the updated summary_dict
+        # print(summary_dict)
+
+        values_array = []
+
+        for key, value in matches:
+            if key in summary_dict:
+                summary_dict[key] = value.strip()
+                values_array.append(value.strip())
+
+        # Print the updated summary_dict and values_array
+        # print(summary_dict)
+        # print(values_array)
+
+        csv_path = 'output_csv/output.csv'
+        save_csv(csv_path, matches_list, values_array)
+
     # Print the list of page image filenames
-    print(f"List of page images for {pdf_file}: {page_images}")
+    # print(f"List of page images for {pdf_file}: {page_images}")
+
+    # Write total_summary to a text file named out.txt
+    # with open(os.path.join(output_folder, "out.txt"), "a", encoding="utf-8") as text_file:
+    #     text_file.write(total_summary)
+    
+    # Write test_summary to a text file named testout.txt
+    # with open(os.path.join(output_folder, "testout.txt"), "a", encoding="utf-8") as text_file:
+    #     text_file.write(test_summary)
+
     return page_images
 
 
@@ -159,6 +243,11 @@ def home_page():
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
 
+        # Delete output.csv file if it exists
+        output_csv_path = os.path.join(GENERATE_CSV_FOLDER, 'output.csv')
+        if os.path.exists(output_csv_path):
+            os.remove(output_csv_path)
+
         return render_template('home/home-page.html')
     else:
         return render_template('home/home-page.html')  # Or redirect to another page if the folder doesn't exist
@@ -199,7 +288,7 @@ def process_files(session_id):
 
         for index, filename in enumerate(uploaded_files):
             # Simulate processing of each file
-            time.sleep(3)  # Simulate processing delay
+            # time.sleep(3)  # Simulate processing delay
             process_pdf_extract_image(filename)
             pdf_path = os.path.join(UPLOAD_FOLDER, filename)
             pdf_to_jpg(pdf_path, EXTRACTED_PAGE_IMAGES_FOLDER, zoom=2)
@@ -245,22 +334,58 @@ def download_files(session_id):
 
     return send_file(zip_filepath, as_attachment=True)
 
-# @app.before_request
-# def log_request_info():
-#     print(f'Request URL: {request.url}')
-#     print(f'Request Method: {request.method}')
-#     print(f'Request Headers: {request.headers}')
-#     print(f'Request Body: {request.get_data()}')
+from flask import send_file, jsonify
+
+@app.route('/download-csv/<session_id>')
+def download_csv(session_id):
+    csv_filepath = 'output_csv/output.csv'
+
+    if os.path.exists(csv_filepath):
+        return send_file(csv_filepath, as_attachment=True)
+    else:
+        return jsonify({'error': 'output.csv not found'}), 404
 
 
-@app.route('/sendData', methods=['POST'])
-def log_post_request():
-    data = request.get_json()
-    print(data)
-    with open('log.txt', 'a') as f:
-        f.write(str(data) + '\n')
-    return 'Received and logged the POST request successfully!', 200
+@app.route('/custom-prompt', methods=['GET', 'POST'])
+def text_editor():
+    if request.method == 'POST':
+        # Handle form submission if needed
+        pass
+
+    custom_prompt_file = 'dynamic/txt/custom_prompt.txt'
+    default_content = ''
+    
+    # Read the content of custom_prompt.txt if it exists
+    if os.path.exists(custom_prompt_file):
+        with open(custom_prompt_file, 'r', encoding='utf-8') as f:
+            default_content = f.read()
+    
+    return render_template('custom/custom-prompt-page.html', default_content=default_content)
+
+
+@app.route('/save-content', methods=['POST'])
+def save_content():
+    content = request.form.get('content')
+
+    if content.strip():  # Check if content is not empty or whitespace
+        custom_prompt_file = 'dynamic/txt/custom_prompt.txt'
+        with open(custom_prompt_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+        return jsonify({'message': 'Saved Successfully'}), 200
+    else:
+        return jsonify({'error': 'Content is empty'}), 400
+
+@app.route('/download-template')
+def download_template():
+    template_file = 'static/txt/custom_prompt_template.txt'
+    return send_file(template_file, as_attachment=True)
+
+@app.route('/save-csv')
+def save_outputcsv():
+    
+    save_csv(csv_path,"hello word")
+    return "success"
 
 if __name__ == '__main__':
-    app.register_blueprint(apps)
     app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

@@ -70,9 +70,25 @@
             color: #333;
             margin-top: 10px;
         }
+
+        .custom-prompt-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #28a745; /* Green background */
+            color: white; /* White text */
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
+
+<button class="custom-prompt-button" onclick="goToCustomPrompt()">Custom Prompt Edit</button>
+
 
 <div class="upload-container" id="uploadContainer">
     <div class="upload-icon">📁</div>
@@ -142,6 +158,10 @@
         const fileNames = Array.from(files).map(file => file.name);
         const truncatedFileNames = fileNames.map(name => name.length > 30 ? name.slice(0, 30) + '...' : name);
         fileList.textContent = truncatedFileNames.join(', ');
+    }
+
+    function goToCustomPrompt() {
+        window.location.href = '/custom-prompt';
     }
 </script>
 

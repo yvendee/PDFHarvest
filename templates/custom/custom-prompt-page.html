@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor</title>
+    <style>
+        /* Add your CSS styles here */
+        .editor {
+            width: 80%;
+            height: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .button {
+            margin-right: 10px;
+        }
+        .message {
+            color: green;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Custom Prompt Editor</h2>
+    <textarea id="editor" class="editor">{{ default_content }}</textarea>
+    <br>
+    <button class="button" onclick="saveText()">Save</button>
+    <button class="button" onclick="downloadTemplate()">Download Template</button>
+    <button class="button" onclick="goBack()">Back</button>
+    <div id="message" class="message"></div>
+
+    <script>
+        function saveText() {
+            var content = document.getElementById('editor').value.trim(); // Trim to remove leading/trailing whitespace
+            if (content === '') {
+                return; // Do nothing if content is empty
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/save-content', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        showMessage('Saved Successfully');
+                    } else {
+                        console.error('Error:', xhr.responseText);
+                    }
+                }
+            };
+            xhr.send('content=' + encodeURIComponent(content));
+        }
+
+        function showMessage(message) {
+            var messageElement = document.getElementById('message');
+            messageElement.innerText = message;
+            messageElement.style.display = 'block';
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 2000); // Hide message after 2 seconds
+        }
+
+        function downloadTemplate() {
+            window.location.href = '/download-template';
+        }
+
+        function goBack() {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
