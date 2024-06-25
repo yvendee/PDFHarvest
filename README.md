@@ -11,7 +11,7 @@ python --version
 3.) Add the OPENAI_API_KEY to the environment variables first.
 
 3.) Jump in the working dir named "PDF Harvester".
-cd <working-dir>
+cd ".../pdf harvester"
 
 4.) (Optional) use virtualenv.
 python -m venv env
