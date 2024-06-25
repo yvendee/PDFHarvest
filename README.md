@@ -1,38 +1,45 @@
 # PDFHarvest
 
-## For windowsOS
+## For Windows OS
 
-1.) Install Python binaries here:
+1. Install Python binaries here:
+   [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
-https://www.python.org/downloads/
-
-2.) Test python (I've assume you already add the python path in the enviroment variables.
-
+2. Test Python installation (Ensure Python executable path is added to the environment variables.):
 python --version
 
-3.) Add the OPENAI_API_KEY to the environment variables first.
 
-3.) Jump in the working dir named "PDF Harvester".
+
+3. Add the OPENAI_API_KEY to the environment variables.
+
+4. Jump to the working directory named "PDF Harvester":
 
 cd ".../pdf harvester"
 
-4.) (Optional) use virtualenv.
+
+
+5. (Optional) Use virtualenv:
 
 python -m venv env
 
-5. (Optional) activate virtualenv.
-6. 
-source ".../bin/scripts/activate"
 
-6.) Install python libraries.
 
+6. (Optional) Activate virtualenv:
+ 
+".../env/Scripts/activate" # Use this for Windows
+
+
+
+7. Install Python libraries:
 python -m pip install -r requirements.txt
 
-7.) Run the flask application.
 
+
+8. Run the Flask application:
 python app.py
 
 
-6.) Visit the webapp using your internet browser at localhost:5000
 
-7.) Happy testing
+9. Visit the web app using your internet browser at `localhost:5000`.
+
+10. Happy testing!
