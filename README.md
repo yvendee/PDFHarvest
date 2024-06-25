@@ -4,7 +4,7 @@
 
 1. Install Python binaries here:
    ```
-   https://www.python.org/downloads/](https://www.python.org/downloads/
+   https://www.python.org/downloads/
    ```
 3. Test Python installation (Ensure Python executable path is added to the environment variables.):
 ```
