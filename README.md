@@ -28,24 +28,24 @@
 
 6. (Optional) Activate virtualenv:
  ```
-source ".../env/Scripts/activate" # Use this for Windows
+   source ".../env/Scripts/activate" # Use this for Windows
 ```
 
 
 7. Install Python libraries:
 ```
-python -m pip install -r requirements.txt
+   python -m pip install -r requirements.txt
 ```
 
 
 9. Run the Flask application:
 ```
-python app.py
+   python app.py
 ```
 
 11. Visit the web app using your internet browser at
 ```
-    localhost:5000`.
+    localhost:5000
 ```
 
 13. Happy testing!
