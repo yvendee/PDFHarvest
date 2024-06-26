@@ -18,6 +18,7 @@ from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_te
 from custom_prompt.utils.utils import read_custom_prompt
 from csv_functions.utils.utils import save_csv
 
+processing_threads = {}  # Initialize an empty dictionary to keep track of processing threads
 
 # Build app
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
@@ -356,23 +357,34 @@ def status_page():
         return redirect(url_for('login'))
     return render_template('status/status-page.html')
 
-@app.route('/progress/<session_id>')
-def progress_status(session_id):
+@app.route('/process/<session_id>', methods=['POST'])
+@login_required
+def process_files(session_id):
     if not check_authenticated():
         return jsonify({'error': 'Unauthorized access'}), 401
-    if session_id in progress:
-        return jsonify(progress[session_id]), 200
+    
+    def mock_processing():
+        # Simulated processing logic
+        pass
+    
+    if session_id not in processing_threads:
+        thread = Thread(target=mock_processing)
+        processing_threads[session_id] = thread
+        thread.start()
+        return jsonify({'message': 'Processing started'}), 200
     else:
-        return jsonify({'error': 'Invalid session ID'}), 400
+        return jsonify({'error': 'Processing already started for this session ID'}), 400
 
 @app.route('/cancel/<session_id>', methods=['POST'])
 @login_required
 def cancel_processing(session_id):
     if session_id in processing_threads:
-        del processing_threads[session_id]  # Stop the processing
-        # Additional cleanup if necessary
-        return jsonify({'message': 'Processing cancelled'})
-    return jsonify({'error': 'Invalid session ID'}), 400
+        # Implement logic to cancel processing
+        del processing_threads[session_id]
+        return jsonify({'message': 'Processing cancelled'}), 200
+    else:
+        return jsonify({'error': 'Invalid session ID or no processing thread found'}), 400
+
 
 @app.route('/download/<session_id>')
 @login_required
