@@ -1,4 +1,4 @@
-Summarize the text by structuring your summary clearly and concisely to include the following variables in brackets, if value can't be found, so "not found":
+Summarize the text by structuring your summary clearly and concisely to include the following variables in brackets, if value can't be found, so blank:
 "-[maid_name]: (full name)",
 "-[maid_ref_code]: (value)",
 "-[maid_type_option_id]: (value)",

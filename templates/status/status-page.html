@@ -23,6 +23,7 @@
             text-align: center;
             padding: 20px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
         }
         .hidden {
             display: none;
@@ -54,18 +55,37 @@
 </head>
 <body>
 
-<button class="back-button" onclick="goBack()">Back</button>
+<button class="back-button hidden" id="backButton" onclick="cancelProcessing()">Back</button>
 
 <div class="status-container">
     <h2>Status:</h2>
     <p id="progressText">Please wait...</p>
     <p>Working on file <span id="fileNumber">0</span> of <span id="totalFiles">0</span> (<span id="percentageComplete">0</span>% Complete)</p>
+    <p id="timer">Time taken: 0 mins 0 sec</p>
     <button id="downloadButton" class="download-button hidden">Download</button>
 </div>
 
 <script>
+    let startTime;
+    let timerInterval;
+    let sessionId;
+
     function goBack() {
         window.location.href = '/'; // Redirect to home page
+    }
+
+    function cancelProcessing() {
+        fetch(`/cancel/${sessionId}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Processing cancelled') {
+                    clearInterval(timerInterval); // Stop the timer
+                    goBack(); // Redirect to home page
+                } else {
+                    console.error(data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
     }
 
     function updateProgress(sessionId) {
@@ -85,22 +105,37 @@
                     } else {
                         document.getElementById('downloadButton').classList.remove('hidden');
                         document.getElementById('progressText').textContent = ''; // Remove "Please wait..." text
+                        clearInterval(timerInterval); // Stop the timer
+                        document.getElementById('backButton').classList.remove('hidden'); // Show the back button
                     }
                 }
             })
             .catch(error => console.error('Error:', error));
     }
 
+    function startTimer() {
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        const elapsedTime = Date.now() - startTime;
+        const minutes = Math.floor(elapsedTime / 60000);
+        const seconds = Math.floor((elapsedTime % 60000) / 1000);
+        document.getElementById('timer').textContent = `Time taken: ${minutes} mins ${seconds} sec`;
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         // Retrieve session ID from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const sessionId = urlParams.get('session_id');
+        sessionId = urlParams.get('session_id');
         if (sessionId) {
             // Start processing the files
             fetch(`/process/${sessionId}`, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.message === 'Processing started') {
+                        startTimer(); // Start the timer when processing starts
                         updateProgress(sessionId);
                     } else {
                         console.error(data.error);
