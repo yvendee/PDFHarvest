@@ -6,7 +6,7 @@ import re
 
 def get_summary_from_text(summarized_string):
 
-  print("Waiting for the response from OpenAI..")
+  print("Sending text to OpenAI...")
   client = OpenAI()
 
   response = client.chat.completions.create(
@@ -22,7 +22,7 @@ def get_summary_from_text(summarized_string):
     presence_penalty=0
   )
 
-  print("Success!")
+  print("[Success] Sending text to OpenAI")
 
   try:
     summary = response.choices[0].message.content
@@ -49,6 +49,9 @@ def get_summary_from_image(image_path):
           "url": f"data:image/jpeg;base64,{base64_image}"  
       }
   }
+
+  print("Sending image and text to OpenAI...")
+
   client = OpenAI()
 
   response = client.chat.completions.create(
@@ -83,11 +86,13 @@ def get_summary_from_image(image_path):
 
   try:
     summary = response.choices[0].message.content
+    print("[Success] Sending image and text to OpenAI...")
     # print(summary)
     return summary
 
 
   except Exception as e:
+    print("[Failed] Sending image and text to OpenAI...")
     return f"Error generating summary: {e}"
     # return "Summary could not be generated due to an error."
 

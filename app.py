@@ -63,6 +63,7 @@ progress = {}
 def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     # Get the base name of the PDF file to create a subfolder
     base_name = os.path.splitext(os.path.basename(pdf_file))[0]
+    base_name = base_name.replace(" ","_")
     subfolder = os.path.join(output_folder, base_name)
     
     # Ensure the output subfolder exists
@@ -96,8 +97,10 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         img.save(image_filename, "JPEG")
         page_images.append(image_filename)
         # print(f"Page {page_num + 1} of {pdf_file} saved as {image_filename}")
+        print(image_filename)
 
         summary = get_summary_from_image(image_filename)
+        # summary = ""
         total_summary += summary + "\n"  # Add newline between summaries
     
     # Close the PDF file
@@ -113,6 +116,74 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     # Initialize summary_dict based on matches_list
     summary_dict = {match: "" for match in matches_list}
     # print(summary_dict)
+
+    # summary_dict = {
+    #     'maid_name': '',
+    #     'maid_ref_code': '',
+    #     'maid_type_option_id': '',
+    #     'maid_agency': '',
+    #     'availability_status_id': '',
+    #     'nationality_id': '',
+    #     'birth_place': '',
+    #     'siblings_count': '',
+    #     'children_count': '',
+    #     'children_ages': '',
+    #     'Height': '150 cm',
+    #     'Weight': '50 kg',
+    #     'rest_day': '',
+    #     'religion_id': '',
+    #     'marital_status_id': '',
+    #     'education_id': '',
+    #     'education_info': '',
+    #     'maid_current_salary': '',
+    #     'maid_current_rest_day_id': '',
+    #     'maid_preferred_rest_day_id': '',
+    #     'home_address': '',
+    #     'home_number': '',
+    #     'home_contacts': '',
+    #     'repatriate': '',
+    #     'maid_passport_number': '',
+    #     'maid_passport_expiry': '',
+    #     'maid_work_permit_number': '',
+    #     'maid_work_permit_expiry': '',
+    #     'is_youtube_video': '',
+    #     'youtube_link': '',
+    #     'Language-English-Experience': '',
+    #     'Language-English-stars': '',
+    #     'languages_observations': '',
+    #     'Expertise-Care for Infant|Children-Experience â€“ Willing?': '',
+    #     'Expertise-Care for Infant|Children-Experience': '',
+    #     'Expertise-Care for Infant|Children-stars': '',
+    #     'Expertise-Care for Elderly-Experience â€“ Willing?': '',
+    #     'Expertise-Care for Elderly-Experience': '',
+    #     'Expertise-Care for Elderly-stars': '',
+    #     'Expertise-Care for Disabled-Experience â€“ Willing?': '',
+    #     'Expertise-Care for Disabled-Experience': '',
+    #     'Expertise-Care for Disabled-stars': '',
+    #     'Expertise-General Housework-Experience â€“ Willing?': '',
+    #     'Expertise-General Housework-Experience': '',
+    #     'Expertise-General Housework-stars': '',
+    #     'Expertise-Cooking-Experience â€“ Willing?': '',
+    #     'Expertise-Cooking-Experience': '',
+    #     'Expertise-Cooking-stars': '',
+    #     'skills_observations': '',
+    #     'AdditionalInfo-Able to handle pork?': '',
+    #     'AdditionalInfo-Able to eat pork?': '',
+    #     'AdditionalInfo-Able to handle beef?': '',
+    #     'AdditionalInfo-Able to care dog|cat?': '',
+    #     'AdditionalInfo-Able to do gardening work?': '',
+    #     'AdditionalInfo-Able to do simple sewing?': '',
+    #     'AdditionalInfo-Willing to wash car?': '',
+    #     'Experience-Singaporean-Experience': '',
+    #     'maid_introduction': '',
+    #     'maid_employment_history': '',
+    #     'maid_status': '',
+    #     'employment_status_id': '',
+    #     'Language-Mandarin|Chinese-Dialect-Experience': '',
+    #     'Language-Mandarin|Chinese-Dialect-stars': '',
+    #     'Experience-Others-Experience': '',
+    #     'Experience-Malaysian-Experience': ''
+    # }
 
 
     if custom_prompt not in ["Not Found", "Read Error"]:
@@ -138,6 +209,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         # - [Number of Children]: 1
         # """
 
+
         # Extracting values and updating summary_dict
         pattern = r'\[(.*?)\]:\s*(.*)'
         matches = re.findall(pattern, summary_text)
@@ -146,15 +218,13 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             if key in summary_dict:
                 summary_dict[key] = value.strip()
 
-        # Print the updated summary_dict
-        # print(summary_dict)
-
+        # Creating values_array based on summary_dict
         values_array = []
-
-        for key, value in matches:
-            if key in summary_dict:
-                summary_dict[key] = value.strip()
-                values_array.append(value.strip())
+        for key in summary_dict:
+            if summary_dict[key] == '':
+                values_array.append(' ')
+            else:
+                values_array.append(summary_dict[key])
 
         # Print the updated summary_dict and values_array
         # print(summary_dict)
@@ -166,13 +236,15 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     # Print the list of page image filenames
     # print(f"List of page images for {pdf_file}: {page_images}")
 
-    # Write total_summary to a text file named out.txt
-    # with open(os.path.join(output_folder, "out.txt"), "a", encoding="utf-8") as text_file:
-    #     text_file.write(total_summary)
+    ## Write total_summary to a text file named out.txt
+    with open(os.path.join(output_folder, "total-summary.txt"), "a", encoding="utf-8") as text_file:
+        text_file.write(total_summary)
+        text_file.write("----------------------------------------------------------")
     
-    # Write test_summary to a text file named testout.txt
-    # with open(os.path.join(output_folder, "testout.txt"), "a", encoding="utf-8") as text_file:
-    #     text_file.write(test_summary)
+    ## Write test_sumsummary_textmary to a text file named testout.txt
+    with open(os.path.join(output_folder, "summary_text.txt"), "a", encoding="utf-8") as text_file:
+        text_file.write(summary_text)
+        text_file.write("----------------------------------------------------------")
 
     return page_images
 
