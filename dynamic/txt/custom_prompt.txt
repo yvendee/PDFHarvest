@@ -1,9 +1,9 @@
 Summarize the text by like this y as keys and x  as values and z as comment or options,
 
- [y1]: x1 , #z1
- [y2]: x2 , #z2
+[y1]: x1 , #z1
+[y2]: x2 , #z2
 
- Complete the following structure, the first option is the default value, now remove the comment like x #fullname and more in final output:
+Complete the following structure, the first option is the default value, now remove the comment like x #fullname and more in final output:
 
 [maid name]: x , #fullname
 [maid ref code]: x , #If not-found, take the first two letters of the name and generate 6 random numbers
