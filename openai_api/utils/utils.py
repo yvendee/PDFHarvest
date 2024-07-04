@@ -10,12 +10,12 @@ def get_summary_from_text(summarized_string):
   client = OpenAI()
 
   response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-3.5-turbo",
     messages=[
         {"role": "system", "content": "Please analyze the summarized text and extract relevant information."},
         {"role": "user", "content": summarized_string}
     ],
-    temperature=1,
+    temperature=0.7,
     max_tokens=2030,
     top_p=1,
     frequency_penalty=0,
