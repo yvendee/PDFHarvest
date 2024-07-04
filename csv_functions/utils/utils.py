@@ -2,6 +2,9 @@ import os
 
 def save_csv(filename, header, data):
 
+    # Replace spaces with underscores in headers
+    header = [column.replace(' ', '_') for column in header]
+
     # Check if the file exists
     file_exists = os.path.exists(filename)
 

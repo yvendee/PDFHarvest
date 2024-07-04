@@ -1,66 +1,71 @@
-Summarize the text by structuring your summary clearly and concisely to include the following variables in brackets, if value can't be found, so blank:
-"-[maid_name]: (full name)",
-"-[maid_ref_code]: (value)",
-"-[maid_type_option_id]: (value)",
-"-[maid_agency]: (value)",
-"-[availability_status_id]: (value)",
-"-[nationality_id]: (value)",
-"-[birth_place]: (value)",
-"-[siblings_count]: (value)",
-"-[children_count]: (value)",
-"-[children_ages]: (value)",
-"-[Height]: (value in cm)",
-"-[Weight]: (value in kg)",
-"-[rest_day]: (values should be "1 off day per month", "1 off day per month", "2 off day per month", "3 off day per month" or "4 off day per month". In the event it cannot be found, return "1 off day per month)",
-"-[religion_id]: (value)",
-"-[marital_status_id]: (value)",
-"-[education_id]: (value)",
-"-[education_info]: (value)",
-"-[maid_current_salary]: (value)",
-"-[maid_current_rest_day_id]: (value)",
-"-[maid_preferred_rest_day_id]: (value)",
-"-[home_address]: (value)",
-"-[home_number]: (value)",
-"-[home_contacts]: (value)",
-"-[repatriate]: (value)",
-"-[maid_passport_number]: (value)",
-"-[maid_passport_expiry]: (value)",
-"-[maid_work_permit_number]: (value)",
-"-[maid_work_permit_expiry]: (value)",
-"-[is_youtube_video]: (value)",
-"-[youtube_link]: (value)",
-"-[Language-English-Experience]: (value)",
-"-[Language-English-stars]: (value)",
-"-[languages_observations]: (value)",
-"-[Expertise-Care for Infant/Children-Experience – Willing?]: (value)",
-"-[Expertise-Care for Infant/Children-Experience]: (value)",
-"-[Expertise-Care for Infant/Children-stars]: (value)",
-"-[Expertise-Care for Elderly-Experience – Willing?]: (value)",
-"-[Expertise-Care for Elderly-Experience]: (value)",
-"-[Expertise-Care for Elderly-stars]: (value)",
-"-[Expertise-Care for Disabled-Experience – Willing?]: (value)",
-"-[Expertise-Care for Disabled-Experience]: (value)",
-"-[Expertise-Care for Disabled-stars]: (value)",
-"-[Expertise-General Housework-Experience – Willing?]: (value)",
-"-[Expertise-General Housework-Experience]: (value)",
-"-[Expertise-General Housework-stars]: (value)",
-"-[Expertise-Cooking-Experience – Willing?]: (value)",
-"-[Expertise-Cooking-Experience]: (value)",
-"-[Expertise-Cooking-stars]: (value)",
-"-[skills_observations]: (value)",
-"-[AdditionalInfo-Able to handle pork?]: (value)",
-"-[AdditionalInfo-Able to eat pork?]: (value)",
-"-[AdditionalInfo-Able to handle beef?]: (value)",
-"-[AdditionalInfo-Able to care dog/cat?]: (value)",
-"-[AdditionalInfo-Able to do gardening work?]: (value)",
-"-[AdditionalInfo-Able to do simple sewing?]: (value)",
-"-[AdditionalInfo-Willing to wash car?]: (value)",
-"-[Experience-Singaporean-Experience]: (value)",
-"-[maid_introduction]: (value)",
-"-[maid_employment_history]: (value)",
-"-[maid_status]: (value)",
-"-[employment_status_id]: (value)",
-"-[Language-Mandarin/Chinese-Dialect-Experience]: (value)",
-"-[Language-Mandarin/Chinese-Dialect-stars]: (value)",
-"-[Experience-Others-Experience]: (value)",
-"-[Experience-Malaysian-Experience]: (value)"
+Summarize the text by like this y as keys and x  as values and z as comment or options,
+
+ [y1]: x1 , #z1
+ [y2]: x2 , #z2
+
+ Complete the following structure, the first option is the default value, now remove the comment like x #fullname and more in final output:
+
+[maid name]: x , #fullname
+[maid ref code]: x , #If not-found, take the first two letters of the name and generate 6 random numbers
+[maid type option id]: x , # New Maid|Ex Maid|Transfer
+[maid agency]: x ,
+[availability status id]: x , # other|One week|2 Weeks|4 5weeks|5 6weeks|Immediate
+[nationality id]: x , # Filipino|Indonesian|Myanmarese|Indian|Bangladeshi|Sri Lankan|Cambodian|Thai|Malaysian
+[birth place]: x ,
+[siblings count]: x ,
+[children count]: x ,
+[children ages]: x ,
+[Height]: x , # in cm
+[Weight]: x , # in kg
+[rest day]: x , # 1 off day per month|1 off day per month|2 off day per month|3 off day per month|4 off day per month
+[religion id]: x , #not-found
+[marital status id]: x ,
+[education id]: Others,
+[education info]: x ,
+[maid current salary]: x ,
+[maid current rest day id]: x ,
+[maid preferred rest day id]: x ,
+[home address]: x ,
+[home number]: x ,
+[home contacts]: x ,
+[repatriate]: x ,
+[maid passport number]: x ,
+[maid passport expiry]: x ,
+[maid work permit number]: x ,
+[maid work permit expiry]: x ,
+[is youtube video]: x ,
+[youtube link]: x ,
+[Language English Experience]: x , #in years
+[Language English stars]: x ,
+[languages observations]: x ,
+[Expertise Care for Infant|Children Experience – Willing?]: x, #yes/no
+[Expertise Care for Infant|Children Experience]: x,#yes/no
+[Expertise Care for Infant|Children stars]: x,
+[Expertise Care for Elderly Experience – Willing?]: x, #yes/no
+[Expertise Care for Elderly Experience]: x, #yes/no
+[Expertise Care for Elderly stars]: x,
+[Expertise Care for Disabled Experience – Willing?]: x, #yes/no
+[Expertise Care for Disabled Experience]: x, #yes/no
+[Expertise Care for Disabled stars]: x, 
+[Expertise General Housework Experience – Willing?]: x, #yes/no
+[Expertise General Housework Experience]: x,
+[Expertise General Housework stars]: x, #yes/no
+[Expertise Cooking Experience – Willing?]: x, #yes/no
+[Expertise Cooking Experience]: x,
+[Expertise Cooking stars]: x,
+[skills observations]: x , #not-found
+[AdditionalInfo Able to handle pork?]: x , #yes/no
+[AdditionalInfo Able to eat pork?]: x , #yes/no
+[AdditionalInfo Able to handle beef?]: x , #yes/no
+[AdditionalInfo Able to care dog|cat?]: x , #yes/no
+[AdditionalInfo Able to do gardening work?]: x , #yes/n
+[AdditionalInfo Able to do simple sewing?]: x , #yes/n
+[AdditionalInfo Willing to wash car?]: x , #yes/n
+[Experience Singaporean Experience]: x , #yes/n
+[maid introduction]: x , #not-found
+[maid employment history]: x , #not-found
+[maid status]: x ,#Unemployed|Employed|Reserved|Booked|Repatriated
+[employment status id]: x , #not-found
+[Language Mandarin|Chinese Dialect Experience]: x , # Mandarin|Chinese Dialect
+[Language Mandarin|Chinese Dialect stars]: x , #not-found
+[Experience Others Experience]: x, #not-found

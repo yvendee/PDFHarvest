@@ -1,67 +1,71 @@
-"Summarize the text by structuring your summary to include the following variables in brackets:
+Summarize the text by like this y as keys and x  as values and z as comment or options,
 
-- `[maid_name]`: full name
-- `[maid_ref_code]`: If not found, use the first two letters of the name + 6 random numbers
-- `[maid_type_option_id]`: New Maid|Ex Maid|Transfer
-- `[maid_agency]`: 
-- `[availability_status_id]`: other|One-week|2-Weeks|4-5weeks|5-6weeks|Immediate
-- `[nationality_id]`: Filipino|Indonesian|Myanmarese|Indian|Bangladeshi|Sri Lankan|Cambodian|Thai|Malaysian
-- `[birth_place]`: 
-- `[siblings_count]`: 
-- `[children_count]`: 
-- `[children_ages]`: 
-- `[Height]`: in cm
-- `[Weight]`: in kg
-- `[rest_day]`: 1 off day per month|2 off days per month|3 off days per month|4 off days per month
-- `[religion_id]`: 
-- `[marital_status_id]`: 
-- `[education_id]`: Others
-- `[education_info]`: 
-- `[maid_current_salary]`: 
-- `[maid_current_rest_day_id]`: 
-- `[maid_preferred_rest_day_id]`: 
-- `[home_address]`: 
-- `[home_number]`: 
-- `[home_contacts]`: 
-- `[repatriate]`: 
-- `[maid_passport_number]`: 
-- `[maid_passport_expiry]`: 
-- `[maid_work_permit_number]`: 
-- `[maid_work_permit_expiry]`: 
-- `[is_youtube_video]`: 
-- `[youtube_link]`: 
-- `[Language-English-Experience]`: 
-- `[Language-English-stars]`: 
-- `[languages_observations]`: 
-- `[Expertise-Care for Infant|Children-Experience – Willing?]`: Y|N
-- `[Expertise-Care for Infant|Children-Experience]`: Y|N
-- `[Expertise-Care for Infant|Children-stars]`: Y|N
-- `[Expertise-Care for Elderly-Experience – Willing?]`: Y|N
-- `[Expertise-Care for Elderly-Experience]`: Y|N
-- `[Expertise-Care for Elderly-stars]`: Y|N
-- `[Expertise-Care for Disabled-Experience – Willing?]`: Y|N
-- `[Expertise-Care for Disabled-Experience]`: Y|N
-- `[Expertise-Care for Disabled-stars]`: Y|N
-- `[Expertise-General Housework-Experience – Willing?]`: Y|N
-- `[Expertise-General Housework-Experience]`: Y|N
-- `[Expertise-General Housework-stars]`: Y|N
-- `[Expertise-Cooking-Experience – Willing?]`: Y|N
-- `[Expertise-Cooking-Experience]`: Y|N
-- `[Expertise-Cooking-stars]`: Y|N
-- `[skills_observations]`: not-found|
-- `[AdditionalInfo-Able to handle pork?]`: Y|N
-- `[AdditionalInfo-Able to eat pork?]`: Y|N
-- `[AdditionalInfo-Able to handle beef?]`: Y|N
-- `[AdditionalInfo-Able to care dog|cat?]`: Y|N
-- `[AdditionalInfo-Able to do gardening work?]`: Y|N
-- `[AdditionalInfo-Able to do simple sewing?]`: Y|N
-- `[AdditionalInfo-Willing to wash car?]`: Y|N
-- `[Experience-Singaporean-Experience]`: Y|N
-- `[maid_introduction]`: not-found|
-- `[maid_employment_history]`: not-found|
-- `[maid_status]`: Unemployed|Employed|Reserved|Booked|Repatriated
-- `[employment_status_id]`: not-found|
-- `[Language-Mandarin|Chinese-Dialect-Experience]`: Mandarin|Chinese-Dialect
-- `[Language-Mandarin|Chinese-Dialect-stars]`: not-found|
-- `[Experience-Others-Experience]`: not-found|
-- `[Experience-Malaysian-Experience]`: not-found|"
+ [y1]: x1 , #z1
+ [y2]: x2 , #z2
+
+ Complete the following structure, the first option is the default value, now remove the comment like x #fullname and more in final output:
+
+[maid name]: x , #fullname
+[maid ref code]: x , #If not-found, take the first two letters of the name and generate 6 random numbers
+[maid type option id]: x , # New Maid|Ex Maid|Transfer
+[maid agency]: x ,
+[availability status id]: x , # other|One week|2 Weeks|4 5weeks|5 6weeks|Immediate
+[nationality id]: x , # Filipino|Indonesian|Myanmarese|Indian|Bangladeshi|Sri Lankan|Cambodian|Thai|Malaysian
+[birth place]: x ,
+[siblings count]: x ,
+[children count]: x ,
+[children ages]: x ,
+[Height]: x , # in cm
+[Weight]: x , # in kg
+[rest day]: x , # 1 off day per month|1 off day per month|2 off day per month|3 off day per month|4 off day per month
+[religion id]: x , #not-found
+[marital status id]: x ,
+[education id]: Others,
+[education info]: x ,
+[maid current salary]: x ,
+[maid current rest day id]: x ,
+[maid preferred rest day id]: x ,
+[home address]: x ,
+[home number]: x ,
+[home contacts]: x ,
+[repatriate]: x ,
+[maid passport number]: x ,
+[maid passport expiry]: x ,
+[maid work permit number]: x ,
+[maid work permit expiry]: x ,
+[is youtube video]: x ,
+[youtube link]: x ,
+[Language English Experience]: x , #in years
+[Language English stars]: x ,
+[languages observations]: x ,
+[Expertise Care for Infant|Children Experience – Willing?]: x, #yes/no
+[Expertise Care for Infant|Children Experience]: x,#yes/no
+[Expertise Care for Infant|Children stars]: x,
+[Expertise Care for Elderly Experience – Willing?]: x, #yes/no
+[Expertise Care for Elderly Experience]: x, #yes/no
+[Expertise Care for Elderly stars]: x,
+[Expertise Care for Disabled Experience – Willing?]: x, #yes/no
+[Expertise Care for Disabled Experience]: x, #yes/no
+[Expertise Care for Disabled stars]: x, 
+[Expertise General Housework Experience – Willing?]: x, #yes/no
+[Expertise General Housework Experience]: x,
+[Expertise General Housework stars]: x, #yes/no
+[Expertise Cooking Experience – Willing?]: x, #yes/no
+[Expertise Cooking Experience]: x,
+[Expertise Cooking stars]: x,
+[skills observations]: x , #not-found
+[AdditionalInfo Able to handle pork?]: x , #yes/no
+[AdditionalInfo Able to eat pork?]: x , #yes/no
+[AdditionalInfo Able to handle beef?]: x , #yes/no
+[AdditionalInfo Able to care dog|cat?]: x , #yes/no
+[AdditionalInfo Able to do gardening work?]: x , #yes/n
+[AdditionalInfo Able to do simple sewing?]: x , #yes/n
+[AdditionalInfo Willing to wash car?]: x , #yes/n
+[Experience Singaporean Experience]: x , #yes/n
+[maid introduction]: x , #not-found
+[maid employment history]: x , #not-found
+[maid status]: x ,#Unemployed|Employed|Reserved|Booked|Repatriated
+[employment status id]: x , #not-found
+[Language Mandarin|Chinese Dialect Experience]: x , # Mandarin|Chinese Dialect
+[Language Mandarin|Chinese Dialect stars]: x , #not-found
+[Experience Others Experience]: x, #not-found

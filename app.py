@@ -113,6 +113,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     matches_list = re.findall(pattern, custom_prompt)
     # print(matches_list)
 
+    # Filter out "y1" and "y2" from matches_list
+    matches_list = [match for match in matches_list if match not in ["y1", "y2"]]   
+
     # Initialize summary_dict based on matches_list
     summary_dict = {match: "" for match in matches_list}
     # print(summary_dict)
