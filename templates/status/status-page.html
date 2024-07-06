@@ -39,8 +39,18 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .download-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px; /* Adjusted to stay in the top right corner */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* Aligned items to end */
+        }
+
         .download-button {
-            background-color: #ff00ff; /* Bright purple background */
+            margin-bottom: 10px;
+            background-color: #28a745; /* Green background */
             color: white; /* White text */
             border: none; /* No border */
             border-radius: 5px; /* Rounded corners */
@@ -48,8 +58,78 @@
             cursor: pointer; /* Pointer cursor on hover */
             font-size: 16px; /* Increase font size */
         }
+
         .download-button:hover {
-            background-color: #cc00cc; /* Darker purple on hover */
+            background-color: #218838; /* Darker green on hover */
+        }
+        /* Progress bar styles */
+        .progress-bar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 20px;
+            background-color: #007bff;
+            transition: width 0.3s ease;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 123, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #007bff;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            overflow-y: auto;
+            max-height: 70vh;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -57,12 +137,31 @@
 
 <button class="back-button hidden" id="backButton" onclick="goBack()">Back</button>
 
+<div class="download-buttons">
+    <button id="downloadGPTButton" class="download-button">Download GPT Summaries</button>
+    <button id="downloadOCRButton" class="download-button">Download OCR</button>
+    <button id="showLogsButton" class="download-button">Show Logs</button>
+</div>
+
 <div class="status-container">
+
     <h2>Status:</h2>
-    <p id="progressText">Please wait...</p>
-    <p>Working on file <span id="fileNumber">0</span> of <span id="totalFiles">0</span> (<span id="percentageComplete">0</span>% Complete)</p>
+    <p id="progressText">Please wait...<span class="spinner"></span></p>
+    <div class="progress-bar">
+        <div id="progressBarFill" class="progress-bar-fill" style="width: 0;"></div>
+    </div>
+    <p>Processed file <span id="fileNumber">0</span> of <span id="totalFiles">0</span> (<span id="percentageComplete">0</span>% Complete)</p>
     <p id="timer">Time taken: 0 mins 0 sec</p>
     <button id="downloadButton" class="download-button hidden">Download</button>
+</div>
+
+<!-- The Modal -->
+<div id="logsModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close" onclick="closeLogsModal()">&times;</span>
+        <pre id="logsContent"></pre>
+    </div>
 </div>
 
 <script>
@@ -100,6 +199,10 @@
                     document.getElementById('fileNumber').textContent = current;
                     document.getElementById('totalFiles').textContent = total;
                     document.getElementById('percentageComplete').textContent = percentageComplete;
+                    
+                    // Update progress bar width
+                    document.getElementById('progressBarFill').style.width = `${percentageComplete}%`;
+
                     if (current < total) {
                         setTimeout(() => updateProgress(sessionId), 1000);
                     } else {
@@ -143,6 +246,21 @@
                 })
                 .catch(error => console.error('Error:', error));
 
+            // Download GPT button click event
+            document.getElementById('downloadGPTButton').addEventListener('click', function() {
+                window.location.href = `/download-gpt/${sessionId}`;
+            });
+
+            // Download OCR button click event
+            document.getElementById('downloadOCRButton').addEventListener('click', function() {
+                window.location.href = `/download-ocr/${sessionId}`;
+            });
+
+            // Show Logs button click event
+            document.getElementById('showLogsButton').addEventListener('click', function() {
+                openLogsModal();
+            });
+
             document.getElementById('downloadButton').addEventListener('click', function() {
                 // Trigger download of .zip file
                 window.location.href = `/download/${sessionId}`;
@@ -159,6 +277,55 @@
             });
         }
     });
+
+    let fetchLogsInterval; // Variable to store the interval ID for fetching logs
+
+    function openLogsModal() {
+        const modal = document.getElementById('logsModal');
+        modal.style.display = 'block'; // Ensure modal is displayed
+
+        // Clear any existing interval for fetching logs
+        clearInterval(fetchLogsInterval);
+
+        // Fetch logs content and update every 200ms
+        fetchLogsContent(sessionId);
+        fetchLogsInterval = setInterval(() => {
+            fetchLogsContent(sessionId);
+            
+            // Check if download button is visible, and if so, clear the interval
+            if (!document.getElementById('downloadButton').classList.contains('hidden')) {
+                clearInterval(fetchLogsInterval);
+            }
+        }, 500);
+
+        // Scroll modal content to bottom initially
+        const logsModalContent = document.querySelector('.modal-content');
+        logsModalContent.scrollTop = logsModalContent.scrollHeight;
+    }
+
+    function closeLogsModal() {
+        const modal = document.getElementById('logsModal');
+        modal.style.display = 'none';
+    }
+
+    function fetchLogsContent(sessionId) {
+        fetch(`/fetch-logs/${sessionId}`)
+            .then(response => response.text())
+            .then(data => {
+                const logsContent = document.getElementById('logsContent');
+                logsContent.textContent = data;
+                logsContent.parentElement.scrollTop = logsContent.parentElement.scrollHeight; // Scroll modal content to bottom
+            })
+            .catch(error => console.error('Error fetching logs:', error));
+    }
+
+    // Close the modal if user clicks outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('logsModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
 </script>
 
 </body>

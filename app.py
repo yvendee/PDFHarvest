@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import Flask, request, Blueprint, render_template, jsonify, session, redirect, url_for, send_file
+
 import os
 import time
 from threading import Thread
@@ -17,7 +18,7 @@ from flask_cors import CORS
 from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_text )
 from custom_prompt.utils.utils import read_custom_prompt
 from csv_functions.utils.utils import save_csv
-
+from log_functions.utils.utils import save_log
 
 # Build app
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
@@ -27,6 +28,9 @@ app.secret_key = 'your_secret_key'  # Needed for session management
 # Hardcoded username and password (for demo purposes)
 USERNAME = "searchmaid"
 PASSWORD = "maidasia"
+
+# Global variable to store current OCR setting
+current_ocr = "tesseractOCR"
 
 # Define a decorator function to check if the user is authenticated
 def login_required(f):
@@ -72,6 +76,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     
     # Open the PDF file
     pdf_document = fitz.open(pdf_file)
+
+
+    save_log(os.path.join(output_folder, "logs.txt"),f"Opening pdf file: {pdf_file}")
     
     # List to store the filenames of the images for each page
     page_images = []
@@ -99,8 +106,13 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         # print(f"Page {page_num + 1} of {pdf_file} saved as {image_filename}")
         print(image_filename)
 
-        summary = get_summary_from_image(image_filename)
-        # summary = ""
+        save_log(os.path.join(output_folder, "logs.txt"),f"Page {page_num + 1} of {pdf_file} extracted")
+
+        save_log(os.path.join(output_folder, "logs.txt"),f"Sending data to OpenAI GPT4o")
+        # summary = get_summary_from_image(image_filename) ## summary text from gpt4o OCR
+        save_log(os.path.join(output_folder, "logs.txt"),f"Received data from OpenAI GPT4o")
+
+        summary = ""
         total_summary += summary + "\n"  # Add newline between summaries
     
     # Close the PDF file
@@ -193,24 +205,26 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         total_summary += custom_prompt + "\n"
 
-        summary_text = get_summary_from_text(total_summary)
+        save_log(os.path.join(output_folder, "logs.txt"),f"Sending data to OpenAI GPT3.5")
+        # summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
+        save_log(os.path.join(output_folder, "logs.txt"),f"Received data from OpenAI GPT3.5")
 
-        # summary_text = """
-        # - [Name]: Tacac Annie Magtortor
-        # - [Date of Birth]: May 27, 1981
-        # - [Age]: 42
-        # - [Place of Birth]: LupaGan Clarin Misam
-        # - [Weight]: 50 kg
-        # - [Height]: 150 cm
-        # - [Nationality]: Filipino
-        # - [Residential Address in Home Country]: Ilagan Isabela
-        # - [Repatriation Port/Airport]: Cauayan City
-        # - [Religion]: Catholic
-        # - [Education Level]: High School (10-12 years)
-        # - [Number of Siblings]: 4
-        # - [Marital Status]: Married
-        # - [Number of Children]: 1
-        # """
+        summary_text = """
+        - [Name]: Tacac Annie Magtortor
+        - [Date of Birth]: May 27, 1981
+        - [Age]: 42
+        - [Place of Birth]: LupaGan Clarin Misam
+        - [Weight]: 50 kg
+        - [Height]: 150 cm
+        - [Nationality]: Filipino
+        - [Residential Address in Home Country]: Ilagan Isabela
+        - [Repatriation Port/Airport]: Cauayan City
+        - [Religion]: Catholic
+        - [Education Level]: High School (10-12 years)
+        - [Number of Siblings]: 4
+        - [Marital Status]: Married
+        - [Number of Children]: 1
+        """
 
 
         # Extracting values and updating summary_dict
@@ -233,24 +247,27 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         # print(summary_dict)
         # print(values_array)
 
+        save_log(os.path.join(output_folder, "logs.txt"),f"Appending data to output.csv")
         csv_path = 'output_csv/output.csv'
         save_csv(csv_path, matches_list, values_array)
 
     # Print the list of page image filenames
     # print(f"List of page images for {pdf_file}: {page_images}")
 
-    ## Write total_summary to a text file named out.txt
-    with open(os.path.join(output_folder, "total-summary.txt"), "a", encoding="utf-8") as text_file:
+    ## Write total_summary
+    with open(os.path.join(output_folder, "ocr_results_plus_prompt.txt"), "a", encoding="utf-8") as text_file:
+        text_file.write(f"[start]{base_name}----------------------------------------------------------")
         text_file.write(total_summary)
-        text_file.write("----------------------------------------------------------")
-    
-    ## Write test_sumsummary_textmary to a text file named testout.txt
-    with open(os.path.join(output_folder, "summary_text.txt"), "a", encoding="utf-8") as text_file:
+        text_file.write(f"\n[end]..{base_name}----------------------------------------------------------\n")
+
+    with open(os.path.join(output_folder, "summary_text_from_gpt35.txt"), "a", encoding="utf-8") as text_file:
+        text_file.write(f"[start]{base_name}----------------------------------------------------------")
         text_file.write(summary_text)
-        text_file.write("----------------------------------------------------------")
+        text_file.write(f"\n[end]..{base_name}----------------------------------------------------------\n")
+    
+    # save_log(os.path.join(output_folder, "logs.txt"),"hello")
 
     return page_images
-
 
 ####### PDF to profile Picture Extraction #######
 # Function to extract images with faces from a specific PDF file
@@ -297,12 +314,18 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 
 # Function to process a specific PDF file in the "uploads" folder
 def process_pdf_extract_image(filename):
+    global EXTRACTED_PAGE_IMAGES_FOLDER
+
     pdf_path = os.path.join(UPLOAD_FOLDER, filename)
     if os.path.exists(pdf_path) and pdf_path.endswith(".pdf"):
         extracted_images = extract_images_with_faces(pdf_path)
         print(f"Processed {pdf_path}: {len(extracted_images)} images extracted with faces")
+        save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"Processed {pdf_path}: {len(extracted_images)} images extracted with faces")
+
     else:
         print(f"File '{filename}' not found or is not a PDF.")
+        save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"File '{filename}' not found or is not a PDF.")
+     
 
 
 # Login route
@@ -409,11 +432,13 @@ def process_files(session_id):
 
         for index, filename in enumerate(uploaded_files):
             # Simulate processing of each file
-            # time.sleep(3)  # Simulate processing delay
+            time.sleep(3)  # Simulate processing delay
             process_pdf_extract_image(filename)
             pdf_path = os.path.join(UPLOAD_FOLDER, filename)
             pdf_to_jpg(pdf_path, EXTRACTED_PAGE_IMAGES_FOLDER, zoom=2)
             progress[session_id]['current'] = index + 1
+
+        save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"Processed Completed. Ready to download!")
 
     if session_id not in progress:
         return jsonify({'error': 'Invalid session ID'}), 400
@@ -522,6 +547,74 @@ def save_content():
 def download_template():
     template_file = 'static/txt/custom_prompt_template.txt'
     return send_file(template_file, as_attachment=True)
+
+
+@app.route('/settings')
+@login_required  # Ensure only authenticated users can access settings
+def settings_page():
+    if not check_authenticated():
+        return redirect(url_for('login'))
+    return render_template('settings/settings-page.html')
+
+
+# Endpoint to handle toggle OCR settings
+@app.route('/toggle-ocr/<setting>', methods=['POST'])
+@login_required
+def toggle_ocr_setting(setting):
+    global current_ocr  # Access the global variable
+    
+    if setting in ['gpt4o', 'tesseract', 'keras']:
+        # Set the current OCR setting based on the URL parameter
+        if setting == 'gpt4o':
+            current_ocr = "gpt4oOCR"
+        elif setting == 'tesseract':
+            current_ocr = "tesseractOCR"
+        elif setting == 'keras':
+            current_ocr = "kerasOCR"
+        
+        # Print the current value of current_ocr
+        print(f"Current OCR setting: {current_ocr}")
+
+        return jsonify({'message': f'Successfully set {setting} OCR setting'}), 200
+    else:
+        return jsonify({'error': 'Invalid OCR setting'}), 400
+
+# Route to retrieve current OCR setting
+@app.route('/current-ocr', methods=['GET'])
+def get_current_ocr():
+    global current_ocr
+    return jsonify({'current_ocr': current_ocr})
+
+
+@app.route('/download-gpt/<session_id>')
+def download_gpt(session_id):
+    # Replace with actual path to summary_text_from_gpt35.txt
+    filepath = 'output_pdf2images/summary_text_from_gpt35.txt'
+    if os.path.exists(filepath):
+        return send_file(filepath, as_attachment=True)
+    else:
+        return jsonify({'error': 'File not found'})
+
+@app.route('/download-ocr/<session_id>')
+def download_ocr(session_id):
+    # Replace with actual path to ocr_results_plus_prompt.txt
+    filepath = 'output_pdf2images/ocr_results_plus_prompt.txt'
+    if os.path.exists(filepath):
+        return send_file(filepath, as_attachment=True)
+    else:
+        return jsonify({'error': 'File not found'})
+
+# Route to fetch logs content
+@app.route('/fetch-logs/<session_id>')
+def fetch_logs(session_id):
+    # Logic to read and return logs.txt content
+    try:
+        with open('output_pdf2images/logs.txt', 'r') as file:
+            logs_content = file.read()
+        return logs_content
+    except Exception as e:
+        return str(e), 500  # Return error message and HTTP status code 500 for server error
+
 
 @app.route('/save-csv')
 @login_required

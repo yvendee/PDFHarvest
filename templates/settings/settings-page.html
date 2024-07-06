@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Settings</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column; /* Align buttons in a column */
+            align-items: center; /* Center align items */
+            margin-top: 50px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-bottom: 10px; /* Adjust spacing between switches */
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .slider.round {
+            border-radius: 34px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        /* Style for the back button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="goBack()">Back</button>
+    
+    <div class="container">
+        <h2>OCR Settings</h2>
+        
+        <label class="switch">
+            <input type="checkbox" id="gpt4o_toggle">
+            <span class="slider round"></span>
+        </label>
+        <p>GPT-4 OCR</p>
+        
+        <label class="switch">
+            <input type="checkbox" id="tesseract_toggle" checked>
+            <span class="slider round"></span>
+        </label>
+        <p>Tesseract OCR</p>
+        
+        <label class="switch">
+            <input type="checkbox" id="keras_toggle">
+            <span class="slider round"></span>
+        </label>
+        <p>Keras OCR</p>
+        
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch initial OCR setting
+            fetch('/current-ocr')
+                .then(response => response.json())
+                .then(data => {
+                    const currentOCR = data.current_ocr;
+                    // Update UI based on initial OCR setting
+                    switch (currentOCR) {
+                        case 'gpt4oOCR':
+                            document.getElementById('gpt4o_toggle').checked = true;
+                            document.getElementById('tesseract_toggle').checked = false;
+                            document.getElementById('keras_toggle').checked = false;
+                            break;
+                        case 'tesseractOCR':
+                            document.getElementById('gpt4o_toggle').checked = false;
+                            document.getElementById('tesseract_toggle').checked = true;
+                            document.getElementById('keras_toggle').checked = false;
+                            break;
+                        case 'kerasOCR':
+                            document.getElementById('gpt4o_toggle').checked = false;
+                            document.getElementById('tesseract_toggle').checked = false;
+                            document.getElementById('keras_toggle').checked = true;
+                            break;
+                        default:
+                            break;
+                    }
+                })
+                .catch(error => console.error('Error fetching current OCR:', error));
+        });
+
+        document.getElementById('gpt4o_toggle').addEventListener('change', function() {
+            if (this.checked) {
+                toggleOCRSetting('gpt4o', true);
+                document.getElementById('tesseract_toggle').checked = false;
+                document.getElementById('keras_toggle').checked = false;
+            }
+        });
+
+        document.getElementById('tesseract_toggle').addEventListener('change', function() {
+            if (this.checked) {
+                toggleOCRSetting('tesseract', true);
+                document.getElementById('gpt4o_toggle').checked = false;
+                document.getElementById('keras_toggle').checked = false;
+            }
+        });
+
+        document.getElementById('keras_toggle').addEventListener('change', function() {
+            if (this.checked) {
+                toggleOCRSetting('keras', true);
+                document.getElementById('gpt4o_toggle').checked = false;
+                document.getElementById('tesseract_toggle').checked = false;
+            }
+        });
+
+        function toggleOCRSetting(setting, enabled) {
+            // Example AJAX call using fetch
+            fetch(`/toggle-ocr/${setting}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ enabled: enabled })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);  // Handle response from server
+                // Optionally update UI based on response
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function goBack() {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
