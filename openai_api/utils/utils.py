@@ -2,6 +2,7 @@ from openai import OpenAI
 import base64
 import json
 import re
+import os
 from log_functions.utils.utils import save_log
 
 LOGPATH = 'output_pdf2images'
@@ -10,8 +11,6 @@ def get_summary_from_text(summarized_string):
   global LOGPATH
 
 
-  print("Sending text to OpenAI...")
-  save_log(os.path.join(LOGPATH, "logs.txt"),"Sending text to OpenAI...")
   client = OpenAI()
 
   response = client.chat.completions.create(

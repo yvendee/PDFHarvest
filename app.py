@@ -212,6 +212,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         total_summary += custom_prompt + "\n"
 
+        print("Sending text to OpenAI  GPT3.5...")
+        save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT3.5...")
+
         summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
 
         # summary_text = """
