@@ -19,6 +19,7 @@ from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_te
 from custom_prompt.utils.utils import read_custom_prompt
 from csv_functions.utils.utils import save_csv
 from log_functions.utils.utils import save_log
+from tesseract.utils.utils import extract_text_from_image
 
 # Build app
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
@@ -108,11 +109,17 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         save_log(os.path.join(output_folder, "logs.txt"),f"Page {page_num + 1} of {pdf_file} extracted")
 
-        save_log(os.path.join(output_folder, "logs.txt"),f"Sending data to OpenAI GPT4o")
-        # summary = get_summary_from_image(image_filename) ## summary text from gpt4o OCR
-        save_log(os.path.join(output_folder, "logs.txt"),f"Received data from OpenAI GPT4o")
 
-        summary = ""
+        if current_ocr == 'gpt4oOCR':
+            summary = get_summary_from_image(image_filename) ## summary text from gpt4o OCR
+        elif current_ocr == 'tesseractOCR':
+            summary = extract_text_from_image(image_filename) ## extracted text from local tesseract OCR
+        else:
+            summary = extract_text_from_image(image_filename) ## extracted text from local tesseract OCR
+        # elif current_ocr == 'kerasOCR':
+        #     pass
+
+        # summary = ""
         total_summary += summary + "\n"  # Add newline between summaries
     
     # Close the PDF file
@@ -205,26 +212,24 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         total_summary += custom_prompt + "\n"
 
-        save_log(os.path.join(output_folder, "logs.txt"),f"Sending data to OpenAI GPT3.5")
-        # summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
-        save_log(os.path.join(output_folder, "logs.txt"),f"Received data from OpenAI GPT3.5")
+        summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
 
-        summary_text = """
-        - [Name]: Tacac Annie Magtortor
-        - [Date of Birth]: May 27, 1981
-        - [Age]: 42
-        - [Place of Birth]: LupaGan Clarin Misam
-        - [Weight]: 50 kg
-        - [Height]: 150 cm
-        - [Nationality]: Filipino
-        - [Residential Address in Home Country]: Ilagan Isabela
-        - [Repatriation Port/Airport]: Cauayan City
-        - [Religion]: Catholic
-        - [Education Level]: High School (10-12 years)
-        - [Number of Siblings]: 4
-        - [Marital Status]: Married
-        - [Number of Children]: 1
-        """
+        # summary_text = """
+        # - [Name]: Tacac Annie Magtortor
+        # - [Date of Birth]: May 27, 1981
+        # - [Age]: 42
+        # - [Place of Birth]: LupaGan Clarin Misam
+        # - [Weight]: 50 kg
+        # - [Height]: 150 cm
+        # - [Nationality]: Filipino
+        # - [Residential Address in Home Country]: Ilagan Isabela
+        # - [Repatriation Port/Airport]: Cauayan City
+        # - [Religion]: Catholic
+        # - [Education Level]: High School (10-12 years)
+        # - [Number of Siblings]: 4
+        # - [Marital Status]: Married
+        # - [Number of Children]: 1
+        # """
 
 
         # Extracting values and updating summary_dict
@@ -256,12 +261,12 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
     ## Write total_summary
     with open(os.path.join(output_folder, "ocr_results_plus_prompt.txt"), "a", encoding="utf-8") as text_file:
-        text_file.write(f"[start]{base_name}----------------------------------------------------------")
+        text_file.write(f"[start]{base_name}----------------------------------------------------------\n")
         text_file.write(total_summary)
         text_file.write(f"\n[end]..{base_name}----------------------------------------------------------\n")
 
     with open(os.path.join(output_folder, "summary_text_from_gpt35.txt"), "a", encoding="utf-8") as text_file:
-        text_file.write(f"[start]{base_name}----------------------------------------------------------")
+        text_file.write(f"[start]{base_name}----------------------------------------------------------\n")
         text_file.write(summary_text)
         text_file.write(f"\n[end]..{base_name}----------------------------------------------------------\n")
     

@@ -27,20 +27,20 @@ def get_summary_from_text(summarized_string):
     presence_penalty=0
   )
 
-  print("[Success] Sending text to OpenAI")
-  save_log(os.path.join(LOGPATH, "logs.txt"),"[Success] Sending text to OpenAI")
+  print("[Success] Sending text to OpenAI GPT3.5")
+  save_log(os.path.join(LOGPATH, "logs.txt"),"[Success] Sending text to OpenAI GPT3.5")
 
 
   try:
     summary = response.choices[0].message.content
     # print(summary)
-    save_log(os.path.join(LOGPATH, "logs.txt"),"Received data from OpenAI")
+    save_log(os.path.join(LOGPATH, "logs.txt"),"Received data from OpenAI GPT3.5")
     return summary
 
 
   except Exception as e:
-    save_log(os.path.join(LOGPATH, "logs.txt"),"[Failed] Sending text to OpenAI...")
-    save_log(os.path.join(LOGPATH, "logs.txt"),f"Error generating summary: {e}")
+    save_log(os.path.join(LOGPATH, "logs.txt"),"[Failed] Sending text to OpenAI GPT3.5...")
+    save_log(os.path.join(LOGPATH, "logs.txt"),f"Error generating summary from OpenAI GPT3.5: {e}")
     return f"Error generating summary: {e}"
     # return "Summary could not be generated due to an error."
   
@@ -95,20 +95,20 @@ def get_summary_from_image(image_path):
     presence_penalty=0
   )
 
-  save_log(os.path.join(LOGPATH, "logs.txt"),"[Success] Sending image and text to OpenAI...")
+  save_log(os.path.join(LOGPATH, "logs.txt"),"[Success] Sending image and text to OpenAI GPT4o...")
 
   try:
     summary = response.choices[0].message.content
     print("[Success] Sending image and text to OpenAI...")
-    save_log(os.path.join(LOGPATH, "logs.txt"),"Received data from OpenAI...")
+    save_log(os.path.join(LOGPATH, "logs.txt"),"Received data from OpenAI GPT4o...")
     # print(summary)
     return summary
 
 
   except Exception as e:
     print("[Failed] Sending image and text to OpenAI...")
-    save_log(os.path.join(LOGPATH, "logs.txt"),"[Failed] Sending image and text to OpenAI...")
-    save_log(os.path.join(LOGPATH, "logs.txt"),f"Error generating summary: {e}")
+    save_log(os.path.join(LOGPATH, "logs.txt"),"[Failed] Sending image and text to OpenAI GPT4o...")
+    save_log(os.path.join(LOGPATH, "logs.txt"),f"Error generating summary from OpenAI GPT4o: {e}")
     return f"Error generating summary: {e}"
     # return "Summary could not be generated due to an error."
 
