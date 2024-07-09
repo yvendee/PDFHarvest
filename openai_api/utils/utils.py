@@ -7,6 +7,39 @@ from log_functions.utils.utils import save_log
 
 LOGPATH = 'output_pdf2images'
 
+
+def get_summary_from_text_test(summarized_string):
+  global LOGPATH
+  try:
+
+    summary = """
+        # - [Name]: Tacac Annie Magtortor
+        # - [Date of Birth]: May 27, 1981
+        # - [Age]: 42
+        # - [Place of Birth]: LupaGan Clarin Misam
+        # - [Weight]: 50 kg
+        # - [Height]: 150 cm
+        # - [Nationality]: Filipino
+        # - [Residential Address in Home Country]: Ilagan Isabela
+        # - [Repatriation Port/Airport]: Cauayan City
+        # - [Religion]: Catholic
+        # - [Education Level]: High School (10-12 years)
+        # - [Number of Siblings]: 4
+        # - [Marital Status]: Married
+        # - [Number of Children]: 1
+        # """
+
+    save_log(os.path.join(LOGPATH, "logs.txt"),"Received data from OpenAI GPT3.5")
+    return summary
+
+
+  except Exception as e:
+    save_log(os.path.join(LOGPATH, "logs.txt"),"[Failed] Sending text to OpenAI GPT3.5...")
+    save_log(os.path.join(LOGPATH, "logs.txt"),f"Error generating summary from OpenAI GPT3.5: {e}")
+    return f"Error generating summary: {e}"
+    # return "Summary could not be generated due to an error."
+  
+
 def get_summary_from_text(summarized_string):
   global LOGPATH
 

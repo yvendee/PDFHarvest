@@ -63,9 +63,52 @@ app.config['EXTRACTED_PAGE_IMAGES_FOLDER'] = EXTRACTED_PAGE_IMAGES_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
 
 progress = {}
+image_fullpath_with_face_list = []
+maidrefcode_list = []
+
+
+# Function to process each data item
+def uppercase_the_first_letter(item):
+    # Split the item into words, lowercase each word, capitalize the first letter
+    words = item.split()
+    processed_words = [word.lower().capitalize() for word in words]
+    return ' '.join(processed_words)
+
+def rename_files(image_fullpath_with_face_list, maidrefcode_list):
+    # Iterate through both lists simultaneously
+    for i in range(len(image_fullpath_with_face_list)):
+        original_path = image_fullpath_with_face_list[i]
+        maidrefcode = maidrefcode_list[i]
+
+        # Extract filename and extension
+        filename, extension = os.path.splitext(original_path)
+
+        # Check if maidrefcode is not empty
+        if maidrefcode:
+            # Form new filename with maidrefcode and original extension
+            new_filename = f"{maidrefcode}{extension}"
+
+            # Construct new full path
+            new_fullpath = os.path.join(os.path.dirname(original_path), new_filename)
+
+            try:
+                # Rename the file
+                os.rename(original_path, new_fullpath)
+
+                # Update image_fullpath_with_face_list with new path
+                image_fullpath_with_face_list[i] = new_fullpath
+
+            except OSError as e:
+                print(f"Error renaming {original_path} to {new_fullpath}: {e}")
+
+    # Return the updated image_fullpath_with_face_list
+    return image_fullpath_with_face_list
+
 
 ####### PDF to Images Extraction ################
 def pdf_to_jpg(pdf_file, output_folder, zoom=2):
+    global maidrefcode_list
+
     # Get the base name of the PDF file to create a subfolder
     base_name = os.path.splitext(os.path.basename(pdf_file))[0]
     base_name = base_name.replace(" ","_")
@@ -243,6 +286,10 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             if key in summary_dict:
                 summary_dict[key] = value.strip()
 
+        # Getting the value corresponding to the key "Name" then stored
+        name_value = summary_dict.get("maid ref code", "")
+        maidrefcode_list.append(name_value)
+
         # Creating values_array based on summary_dict
         values_array = []
         for key in summary_dict:
@@ -280,6 +327,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 ####### PDF to profile Picture Extraction #######
 # Function to extract images with faces from a specific PDF file
 def extract_images_with_faces(pdf_path):
+    global image_fullpath_with_face_list
     # Get the base name of the PDF file
     pdf_basename = os.path.splitext(os.path.basename(pdf_path))[0]
     # Create the main folder if it doesn't exist
@@ -308,8 +356,10 @@ def extract_images_with_faces(pdf_path):
             face_found = True
             # Save the image in the main folder with the PDF base name as the image name
             image_filename = f"{pdf_basename}_{image_index + 1}.jpg"  # Naming based on image index
-            image_pil.save(os.path.join(main_folder, image_filename), "JPEG")
+            image_fullpath = os.path.join(main_folder, image_filename)
+            image_pil.save(image_fullpath, "JPEG")
             extracted_images.append(image_pil)
+            image_fullpath_with_face_list.append(image_fullpath)
             break  # Stop processing further images on the first page once a face is found
 
     pdf_document.close()
@@ -360,6 +410,11 @@ def logout():
 @app.route('/home')
 @login_required
 def home_page():
+    global image_fullpath_with_face_list, maidrefcode_list
+
+    image_fullpath_with_face_list = []
+    maidrefcode_list = []
+
     if not check_authenticated():
         return redirect(url_for('login'))
     # Check if the 'uploads' folder exists before attempting to delete files
@@ -431,6 +486,8 @@ def upload_files():
 @app.route('/process/<session_id>', methods=['POST'])
 @login_required
 def process_files(session_id):
+    global image_fullpath_with_face_list, maidrefcode_list
+
     if not check_authenticated():
         return jsonify({'error': 'Unauthorized access'}), 401
     def mock_processing():
@@ -446,6 +503,10 @@ def process_files(session_id):
             pdf_to_jpg(pdf_path, EXTRACTED_PAGE_IMAGES_FOLDER, zoom=2)
             progress[session_id]['current'] = index + 1
 
+        
+        # print(image_fullpath_with_face_list)
+        # print(maidrefcode_list)
+        rename_files(image_fullpath_with_face_list, maidrefcode_list)
         save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"Processed Completed. Ready to download!")
 
     if session_id not in progress:
