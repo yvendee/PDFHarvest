@@ -6,25 +6,26 @@ Summarize the text by like this y as keys and x  as values and z as comment or o
 Complete the following structure, the first option is the default value, now remove the comment like x #fullname and more in final output:
 
 [maid name]: x , #fullname
-[maid ref code]: x , #If not-found, take the first two letters of the name and generate 6 random numbers
-[maid type option id]: x , # New Maid|Ex Maid|Transfer
-[maid agency]: x ,
-[availability status id]: x , # other|One week|2 Weeks|4 5weeks|5 6weeks|Immediate
-[nationality id]: x , # Filipino|Indonesian|Myanmarese|Indian|Bangladeshi|Sri Lankan|Cambodian|Thai|Malaysian
+[maid ref code]: x , #If the reference code is not found, generate it using the first two letters of the name
+[maid type option id]: x , #Ex Maid|Transfer|New Maid, return New Maid if invalid or not found
+[maid agency]: x , #if not found, leave as null
+[availability status id]: x , #One week|2 Weeks|4 5weeks|5 6weeks|Immediate|other if invalid or not found
+[nationality id]: x , #Filipino|Indonesian|Myanmarese|Indian|Bangladeshi|Sri Lankan|Cambodian|Thai|Malaysian
+[birth date]: x ,
 [birth place]: x ,
-[siblings count]: x ,
+[siblings count]: x , #Get this value from the 'Number of siblings'
 [children count]: x ,
 [children ages]: x ,
-[Height]: x , # in cm
-[Weight]: x , # in kg
-[rest day]: x , # 1 off day per month|1 off day per month|2 off day per month|3 off day per month|4 off day per month
-[religion id]: x , #not-found
+[height]: x , #in cm and remove units and If not found just set "150"
+[weight]: x , #in kg and remove units and If not found just set "Null"
+[rest day]: x,  # pay attention to this and strictly only the following options accepted values are : 1 rest days per month|2 rest days per month|3 rest days per month|4 rest days per month|0 rest days per month, return "0 rest days per month" if not found or does not in the options.
+[religion id]: x , #Buddhist|Catholic|Christian|Free Thinker|Hindu|Muslim|Sikh|Others if invalid or not found
 [marital status id]: x ,
-[education id]: Others,
+[education id]: x , #Secondary level (8~9 yrs)|High School (10~12 yrs)|College/Degree (>=13 yrs)|Others if not found or invalid
 [education info]: x ,
 [maid current salary]: x ,
-[maid current rest day id]: x ,
-[maid preferred rest day id]: x ,
+[maid current rest day id]: x , #1 rest days per month|2 rest days per month|3 rest days per month|4 rest days per month|0 rest days per month, return 0 rest days per month if not found or invalid
+[maid preferred rest day id]: x , #1 rest days per month|2 rest days per month|3 rest days per month|4 rest days per month|0 rest days per month, return 0 rest days per month if not found or invalid
 [home address]: x ,
 [home number]: x ,
 [home contacts]: x ,
@@ -38,34 +39,34 @@ Complete the following structure, the first option is the default value, now rem
 [Language English Experience]: x , #in years
 [Language English stars]: x ,
 [languages observations]: x ,
-[Expertise Care for Infant|Children Experience – Willing?]: x, #yes/no
-[Expertise Care for Infant|Children Experience]: x,#yes/no
-[Expertise Care for Infant|Children stars]: x,
-[Expertise Care for Elderly Experience – Willing?]: x, #yes/no
-[Expertise Care for Elderly Experience]: x, #yes/no
-[Expertise Care for Elderly stars]: x,
-[Expertise Care for Disabled Experience – Willing?]: x, #yes/no
-[Expertise Care for Disabled Experience]: x, #yes/no
-[Expertise Care for Disabled stars]: x, 
-[Expertise General Housework Experience – Willing?]: x, #yes/no
-[Expertise General Housework Experience]: x,
-[Expertise General Housework stars]: x, #yes/no
-[Expertise Cooking Experience – Willing?]: x, #yes/no
-[Expertise Cooking Experience]: x,
-[Expertise Cooking stars]: x,
-[skills observations]: x , #not-found
+[Expertise Care for Infant|Children Experience – Willing?]: x , #yes/no
+[Expertise Care for Infant|Children Experience]: x , #yes/no
+[Expertise Care for Infant|Children stars]: x ,
+[Expertise Care for Elderly Experience – Willing?]: x , #yes/no
+[Expertise Care for Elderly Experience]: x , #yes/no
+[Expertise Care for Elderly stars]: x ,
+[Expertise Care for Disabled Experience – Willing?]: x , #yes/no
+[Expertise Care for Disabled Experience]: x , #yes/no
+[Expertise Care for Disabled stars]: x , 
+[Expertise General Housework Experience – Willing?]: x , #yes/no
+[Expertise General Housework Experience]: x ,
+[Expertise General Housework stars]: x ,
+[Expertise Cooking Experience – Willing?]: x , #yes/no
+[Expertise Cooking Experience]: x ,
+[Expertise Cooking stars]: x ,
+[skills observations]: x ,
 [AdditionalInfo Able to handle pork?]: x , #yes/no
 [AdditionalInfo Able to eat pork?]: x , #yes/no
 [AdditionalInfo Able to handle beef?]: x , #yes/no
 [AdditionalInfo Able to care dog|cat?]: x , #yes/no
-[AdditionalInfo Able to do gardening work?]: x , #yes/n
-[AdditionalInfo Able to do simple sewing?]: x , #yes/n
-[AdditionalInfo Willing to wash car?]: x , #yes/n
-[Experience Singaporean Experience]: x , #yes/n
-[maid introduction]: x , #not-found
-[maid employment history]: x , #not-found
-[maid status]: x ,#Unemployed|Employed|Reserved|Booked|Repatriated
-[employment status id]: x , #not-found
-[Language Mandarin|Chinese Dialect Experience]: x , # Mandarin|Chinese Dialect
-[Language Mandarin|Chinese Dialect stars]: x , #not-found
+[AdditionalInfo Able to do gardening work?]: x , #yes/no
+[AdditionalInfo Able to do simple sewing?]: x , #yes/no
+[AdditionalInfo Willing to wash car?]: x , #yes/no
+[Experience Singaporean Experience]: x , #yes/no
+[maid introduction]: x ,
+[maid employment history]: x , #if possible, will also capture the other data like the date, country and years.
+[maid status]: Published
+[employment status id]: x , #Employed|Reserved|Booked|Repatriated|Unemployed if not found or invalid
+[Language Mandarin|Chinese Dialect Experience]: x , #Mandarin|Chinese Dialect
+[Language Mandarin|Chinese Dialect stars]: x ,
 [Experience Others Experience]: x, #not-found

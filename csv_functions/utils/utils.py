@@ -11,7 +11,7 @@ def save_csv(filename, header, data):
 
     # Function to process each data item
     def process_data_item(item):
-        if item.strip() in ["Not Provided", "Not provided", "Null", "null",  "Not found", "Not Found", "Not-found", "Not-Found","Not Specified", "Not specified", "Not Applicable", "Not applicable"]:
+        if item.strip() in ["Not Provided", "Not provided", "N/A", "N/a", "n/a", "Null", "null",  "Not found", "Not Found", "Not-found", "Not-Found","Not Specified", "Not specified", "Not Applicable", "Not applicable"]:
             return ""
         else:
             return item.strip()

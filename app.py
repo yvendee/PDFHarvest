@@ -7,6 +7,7 @@ from threading import Thread
 import zipfile
 import shutil
 import re
+import random
 
 # import os
 import io
@@ -15,7 +16,9 @@ import cv2
 import numpy as np
 from PIL import Image
 from flask_cors import CORS
-from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_text )
+from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_text, get_summary_from_text_test )
+from anthropic_api.utils.utils import ( get_summary_from_image_using_claude )
+
 from custom_prompt.utils.utils import read_custom_prompt
 from csv_functions.utils.utils import save_csv
 from log_functions.utils.utils import save_log
@@ -31,7 +34,7 @@ USERNAME = "searchmaid"
 PASSWORD = "maidasia"
 
 # Global variable to store current OCR setting
-current_ocr = "tesseractOCR"
+current_ocr = "claudeOCR"
 
 # Define a decorator function to check if the user is authenticated
 def login_required(f):
@@ -152,15 +155,14 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         save_log(os.path.join(output_folder, "logs.txt"),f"Page {page_num + 1} of {pdf_file} extracted")
 
-
         if current_ocr == 'gpt4oOCR':
             summary = get_summary_from_image(image_filename) ## summary text from gpt4o OCR
         elif current_ocr == 'tesseractOCR':
             summary = extract_text_from_image(image_filename) ## extracted text from local tesseract OCR
+        elif current_ocr == 'claudeOCR':
+            summary = get_summary_from_image_using_claude(image_filename) ## summary text from claude Haiku OCR
         else:
-            summary = extract_text_from_image(image_filename) ## extracted text from local tesseract OCR
-        # elif current_ocr == 'kerasOCR':
-        #     pass
+            summary = get_summary_from_image_using_claude(image_filename) ## summary text from claude Haiku OCR
 
         # summary = ""
         total_summary += summary + "\n"  # Add newline between summaries
@@ -278,6 +280,24 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         # """
 
 
+        # summary_text = """
+        # - [Name]: Tacac Annie Magtortor
+        # - [Date of Birth]: May 27, 1981
+        # - [Age]: 42
+        # - [Place of Birth]: LupaGan Clarin Misam
+        # - [Weight]: 50 kg
+        # - [Height]: 150 cm
+        # - [Nationality]: Filipino
+        # - [Residential Address in Home Country]: Ilagan Isabela
+        # - [Repatriation Port/Airport]: Cauayan City
+        # - [Religion]: Catholic
+        # - [Education Level]: High School (10-12 years)
+        # - [Number of Siblings]: 4
+        # - [Marital Status]: Married
+        # - [Number of Children]: 1
+        # """
+
+
         # Extracting values and updating summary_dict
         pattern = r'\[(.*?)\]:\s*(.*)'
         matches = re.findall(pattern, summary_text)
@@ -286,9 +306,24 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             if key in summary_dict:
                 summary_dict[key] = value.strip()
 
-        # Getting the value corresponding to the key "Name" then stored
-        name_value = summary_dict.get("maid ref code", "")
-        maidrefcode_list.append(name_value)
+        ##=========== Special Case Here For Initial Setting of Key Values ================##
+
+        # Getting the value corresponding to the key "maid ref code"" then stored
+        maid_ref_code_value = summary_dict.get("maid ref code", "")
+
+        # Generate a 6-digit random number
+        random_number = random.randint(100000, 999999)
+
+        # Append the random number to maid_ref_code_value
+        maid_ref_code_value += str(random_number)
+
+        ## append to maidrefcode_list for renaming of extracted inage with  face
+        maidrefcode_list.append(maid_ref_code_value)
+
+        summary_dict["maid ref code"] = maid_ref_code_value
+
+        ##================================================================================##
+
 
         # Creating values_array based on summary_dict
         values_array = []
@@ -632,14 +667,14 @@ def settings_page():
 def toggle_ocr_setting(setting):
     global current_ocr  # Access the global variable
     
-    if setting in ['gpt4o', 'tesseract', 'keras']:
+    if setting in ['gpt4o', 'tesseract', 'claude']:
         # Set the current OCR setting based on the URL parameter
         if setting == 'gpt4o':
             current_ocr = "gpt4oOCR"
         elif setting == 'tesseract':
             current_ocr = "tesseractOCR"
-        elif setting == 'keras':
-            current_ocr = "kerasOCR"
+        elif setting == 'claude':
+            current_ocr = "claudeOCR"
         
         # Print the current value of current_ocr
         print(f"Current OCR setting: {current_ocr}")
