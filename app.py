@@ -195,12 +195,16 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
 
+
         # Extracting values and updating summary_dict
         pattern = r'\[(.*?)\]:\s*(.*)'
         matches = re.findall(pattern, summary_text)
 
         for key, value in matches:
             if key in summary_dict:
+                # Check if value is empty, then set to "Null"
+                if not value.strip():
+                    value = "Null"
                 summary_dict[key] = value.strip()
 
         ##=========== Special Case Here For Initial Setting of Key Values ================##
@@ -287,6 +291,8 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
     with open(os.path.join(output_folder, "summary_text_from_gpt35.txt"), "a", encoding="utf-8") as text_file:
         text_file.write(f"[start]{base_name}----------------------------------------------------------\n")
+        # text_file.write(str(summary_dict))
+        # text_file.write("\n")
         text_file.write(summary_text)
         text_file.write(f"\n[end]..{base_name}----------------------------------------------------------\n")
     
