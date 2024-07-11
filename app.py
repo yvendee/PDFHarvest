@@ -155,6 +155,8 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         save_log(os.path.join(output_folder, "logs.txt"),f"Page {page_num + 1} of {pdf_file} extracted")
 
+        save_log(os.path.join(output_folder, "logs.txt"),f"Current OCR used is {current_ocr}")
+
         if current_ocr == 'gpt4oOCR':
             summary = get_summary_from_image(image_filename) ## summary text from gpt4o OCR
         elif current_ocr == 'tesseractOCR':
@@ -184,75 +186,6 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     summary_dict = {match: "" for match in matches_list}
     # print(summary_dict)
 
-    # summary_dict = {
-    #     'maid_name': '',
-    #     'maid_ref_code': '',
-    #     'maid_type_option_id': '',
-    #     'maid_agency': '',
-    #     'availability_status_id': '',
-    #     'nationality_id': '',
-    #     'birth_place': '',
-    #     'siblings_count': '',
-    #     'children_count': '',
-    #     'children_ages': '',
-    #     'Height': '150 cm',
-    #     'Weight': '50 kg',
-    #     'rest_day': '',
-    #     'religion_id': '',
-    #     'marital_status_id': '',
-    #     'education_id': '',
-    #     'education_info': '',
-    #     'maid_current_salary': '',
-    #     'maid_current_rest_day_id': '',
-    #     'maid_preferred_rest_day_id': '',
-    #     'home_address': '',
-    #     'home_number': '',
-    #     'home_contacts': '',
-    #     'repatriate': '',
-    #     'maid_passport_number': '',
-    #     'maid_passport_expiry': '',
-    #     'maid_work_permit_number': '',
-    #     'maid_work_permit_expiry': '',
-    #     'is_youtube_video': '',
-    #     'youtube_link': '',
-    #     'Language-English-Experience': '',
-    #     'Language-English-stars': '',
-    #     'languages_observations': '',
-    #     'Expertise-Care for Infant|Children-Experience â€“ Willing?': '',
-    #     'Expertise-Care for Infant|Children-Experience': '',
-    #     'Expertise-Care for Infant|Children-stars': '',
-    #     'Expertise-Care for Elderly-Experience â€“ Willing?': '',
-    #     'Expertise-Care for Elderly-Experience': '',
-    #     'Expertise-Care for Elderly-stars': '',
-    #     'Expertise-Care for Disabled-Experience â€“ Willing?': '',
-    #     'Expertise-Care for Disabled-Experience': '',
-    #     'Expertise-Care for Disabled-stars': '',
-    #     'Expertise-General Housework-Experience â€“ Willing?': '',
-    #     'Expertise-General Housework-Experience': '',
-    #     'Expertise-General Housework-stars': '',
-    #     'Expertise-Cooking-Experience â€“ Willing?': '',
-    #     'Expertise-Cooking-Experience': '',
-    #     'Expertise-Cooking-stars': '',
-    #     'skills_observations': '',
-    #     'AdditionalInfo-Able to handle pork?': '',
-    #     'AdditionalInfo-Able to eat pork?': '',
-    #     'AdditionalInfo-Able to handle beef?': '',
-    #     'AdditionalInfo-Able to care dog|cat?': '',
-    #     'AdditionalInfo-Able to do gardening work?': '',
-    #     'AdditionalInfo-Able to do simple sewing?': '',
-    #     'AdditionalInfo-Willing to wash car?': '',
-    #     'Experience-Singaporean-Experience': '',
-    #     'maid_introduction': '',
-    #     'maid_employment_history': '',
-    #     'maid_status': '',
-    #     'employment_status_id': '',
-    #     'Language-Mandarin|Chinese-Dialect-Experience': '',
-    #     'Language-Mandarin|Chinese-Dialect-stars': '',
-    #     'Experience-Others-Experience': '',
-    #     'Experience-Malaysian-Experience': ''
-    # }
-
-
     if custom_prompt not in ["Not Found", "Read Error"]:
 
         total_summary += custom_prompt + "\n"
@@ -261,42 +194,6 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT3.5...")
 
         summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
-
-        # summary_text = """
-        # - [Name]: Tacac Annie Magtortor
-        # - [Date of Birth]: May 27, 1981
-        # - [Age]: 42
-        # - [Place of Birth]: LupaGan Clarin Misam
-        # - [Weight]: 50 kg
-        # - [Height]: 150 cm
-        # - [Nationality]: Filipino
-        # - [Residential Address in Home Country]: Ilagan Isabela
-        # - [Repatriation Port/Airport]: Cauayan City
-        # - [Religion]: Catholic
-        # - [Education Level]: High School (10-12 years)
-        # - [Number of Siblings]: 4
-        # - [Marital Status]: Married
-        # - [Number of Children]: 1
-        # """
-
-
-        # summary_text = """
-        # - [Name]: Tacac Annie Magtortor
-        # - [Date of Birth]: May 27, 1981
-        # - [Age]: 42
-        # - [Place of Birth]: LupaGan Clarin Misam
-        # - [Weight]: 50 kg
-        # - [Height]: 150 cm
-        # - [Nationality]: Filipino
-        # - [Residential Address in Home Country]: Ilagan Isabela
-        # - [Repatriation Port/Airport]: Cauayan City
-        # - [Religion]: Catholic
-        # - [Education Level]: High School (10-12 years)
-        # - [Number of Siblings]: 4
-        # - [Marital Status]: Married
-        # - [Number of Children]: 1
-        # """
-
 
         # Extracting values and updating summary_dict
         pattern = r'\[(.*?)\]:\s*(.*)'
@@ -308,19 +205,57 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         ##=========== Special Case Here For Initial Setting of Key Values ================##
 
-        # Getting the value corresponding to the key "maid ref code"" then stored
-        maid_ref_code_value = summary_dict.get("maid ref code", "")
+        try:
+            # Getting the value corresponding to the key "maid ref code"" then stored
+            maid_ref_code_value = summary_dict.get("maid ref code", "")
+            # Generate a 6-digit random number
+            random_number = random.randint(100000, 999999)
+            # Append the random number to maid_ref_code_value
+            maid_ref_code_value += str(random_number)
+            ## append to maidrefcode_list for renaming of extracted inage with  face
+            maidrefcode_list.append(maid_ref_code_value)
+            summary_dict["maid ref code"] = maid_ref_code_value
+        except Exception as e:
+            print(e)
 
-        # Generate a 6-digit random number
-        random_number = random.randint(100000, 999999)
 
-        # Append the random number to maid_ref_code_value
-        maid_ref_code_value += str(random_number)
+        try:
+            religion_id_value = summary_dict.get("religion id", "")
+            #Buddhist|Catholic|Christian|Free Thinker|Hindu|Muslim|Sikh|Others
+            if religion_id_value.strip().lower() in ["buddhist", "catholic", "christian", "free thinker","hindu", "muslim", "sikh"]:
+                summary_dict["religion id"] = religion_id_value.strip().lower()
+            else:
+                summary_dict["religion id"] = "Others"
+        except Exception as e:
+            print(e)
 
-        ## append to maidrefcode_list for renaming of extracted inage with  face
-        maidrefcode_list.append(maid_ref_code_value)
 
-        summary_dict["maid ref code"] = maid_ref_code_value
+        try:
+            rest_day_value = summary_dict.get("rest day", "")
+            if rest_day_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
+                summary_dict["rest day"] = rest_day_value.strip().lower()
+            else:
+                summary_dict["rest day"] = "0 rest days per month"
+        except Exception as e:
+            print(e)
+
+        try:
+            maid_current_rest_day_id_value = summary_dict.get("maid current rest day id", "")
+            if maid_current_rest_day_id_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
+                summary_dict["maid current rest day id"] = maid_current_rest_day_id_value.strip().lower()
+            else:
+                summary_dict["maid current rest day id"] = "0 rest days per month"
+        except Exception as e:
+            print(e)
+
+        try:
+            maid_preferred_rest_day_id_value = summary_dict.get("maid preferred rest day id", "")
+            if maid_preferred_rest_day_id_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
+                summary_dict["maid preferred rest day id"] = maid_preferred_rest_day_id_value.strip().lower()
+            else:
+                summary_dict["maid preferred rest day id"] = "0 rest days per month"
+        except Exception as e:
+            print(e)
 
         ##================================================================================##
 
