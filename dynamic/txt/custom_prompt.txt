@@ -11,7 +11,7 @@ Complete the following structure, the first option is the default value, now rem
 [maid agency]: x , #if not found, leave as null
 [availability status id]: x , #One week|2 Weeks|4 5weeks|5 6weeks|Immediate|other if invalid or not found
 [nationality id]: x , #Filipino|Indonesian|Myanmarese|Indian|Bangladeshi|Sri Lankan|Cambodian|Thai|Malaysian
-[birth date]: x ,
+[birth date]: x , # the date format is dd/MM/YYYY
 [birth place]: x ,
 [siblings count]: x , #Get this value from the 'Number of siblings'
 [children count]: x ,
