@@ -291,8 +291,8 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
     with open(os.path.join(output_folder, "summary_text_from_gpt35.txt"), "a", encoding="utf-8") as text_file:
         text_file.write(f"[start]{base_name}----------------------------------------------------------\n")
-        # text_file.write(str(summary_dict))
-        # text_file.write("\n")
+        text_file.write(str(summary_dict))
+        text_file.write("\n")
         text_file.write(summary_text)
         text_file.write(f"\n[end]..{base_name}----------------------------------------------------------\n")
     
