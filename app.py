@@ -258,7 +258,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             if maid_current_rest_day_id_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
                 summary_dict["maid current rest day id"] = maid_current_rest_day_id_value.strip().lower()
             else:
-                summary_dict["maid current rest day id"] = "0 rest days per month"
+                summary_dict["maid current rest day id"] = "1 rest days per month"
         except Exception as e:
             print(e)
 
@@ -267,7 +267,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             if maid_preferred_rest_day_id_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
                 summary_dict["maid preferred rest day id"] = maid_preferred_rest_day_id_value.strip().lower()
             else:
-                summary_dict["maid preferred rest day id"] = "0 rest days per month"
+                summary_dict["maid preferred rest day id"] = "1 rest days per month"
         except Exception as e:
             print(e)
 
