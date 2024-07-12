@@ -52,7 +52,7 @@ def save_csv(filename, header, data):
 
         # Convert "Yrs" or "Years" to "yrs" or "years" in processed_data2[2]
         if len(processed_data2) > 2:
-            processed_data2[16] = processed_data2[2].replace("Yrs", "yrs").replace("Years", "years")
+            processed_data2[16] = processed_data2[16].replace("Yrs", "yrs").replace("Years", "years")
     except Exception as e:
         print(e)
 
