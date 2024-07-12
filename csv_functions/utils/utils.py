@@ -1,4 +1,13 @@
-import os 
+import os
+import re
+
+# Define accepted characters as a regular expression pattern
+accepted_chars_pattern = r'[ _$a-zA-Z0-9\(\)\-\~\/\\\<\>=\.\@\":;]'
+
+
+def filter_accepted_chars(item):
+    # Use regular expression to filter out unwanted characters
+    return ''.join(re.findall(accepted_chars_pattern, item))
 
 def save_csv(filename, header, data):
     # Replace spaces with underscores in headers
@@ -11,15 +20,21 @@ def save_csv(filename, header, data):
     def process_data_item(item):
         unwanted_values = ["not provided", "n/a", "null", "not found", "not-found", "not specified", "not applicable"]
         item_lower = item.strip().lower()
+        
+        # Check for unwanted values
         for unwanted in unwanted_values:
             if item_lower == unwanted:
                 return ""
-        return item.strip()
+        
+        # Filter accepted characters
+        filtered_item = filter_accepted_chars(item)
+        
+        return filtered_item.strip()
 
     # Process each item in data list
     processed_data = [process_data_item(item) for item in data]
 
-    # Function to process each data item
+    # Function to process each data item and capitalize words
     def process_data_item2(item):
         words = item.split()
         processed_words = []
@@ -30,11 +45,16 @@ def save_csv(filename, header, data):
     # Process each item in data list
     processed_data2 = [process_data_item2(item) for item in processed_data]
 
-    # Special Case: Uppercase All
-    # Uppercase the value of the second index (header) (maid_ref_code) in processed_data2
-    if len(processed_data2) > 1:
-        item = processed_data2[1]  # Assuming you want to access the second item in processed_data2
-        processed_data2[1] = item.upper()  # Uppercase the second index
+    try:
+        # Special Case: Uppercase the second index in processed_data2
+        if len(processed_data2) > 1:
+            processed_data2[1] = processed_data2[1].upper()
+
+        # Convert "Yrs" or "Years" to "yrs" or "years" in processed_data2[2]
+        if len(processed_data2) > 2:
+            processed_data2[16] = processed_data2[2].replace("Yrs", "yrs").replace("Years", "years")
+    except Exception as e:
+        print(e)
 
     with open(filename, 'a', newline='', encoding='utf-8') as csvfile:
         # If the file doesn't exist, write the header
@@ -43,3 +63,10 @@ def save_csv(filename, header, data):
 
         # Write the data
         csvfile.write('"' + '","'.join(processed_data2) + '"\n')
+
+# # # Example usage:
+# filename = 'example.csv'
+# header = ['Column 1', 'Column 2', 'Column 3']
+# data = ['$456â‰0%abA', "hello", 'Secondary level (8~9 Yrs)', 'null']
+
+# save_csv(filename, header, data)

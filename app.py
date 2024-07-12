@@ -222,6 +222,16 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         except Exception as e:
             print(e)
 
+        try:
+            education_id_value = summary_dict.get("education id", "")
+            ## Secondary level (8~9 yrs)|High School (10~12 yrs)|College/Degree (>=13 yrs)|Others
+            if education_id_value.strip().lower() in ["secondary level (8~9 yrs)", "high school (10~12 yrs)", "college/degree (>=13 yrs)"]:
+                summary_dict["education id"] = education_id_value.strip().lower()
+            else:
+                summary_dict["education id"] = "Others"
+        except Exception as e:
+            print(e)
+
 
         try:
             religion_id_value = summary_dict.get("religion id", "")
@@ -239,7 +249,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             if rest_day_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
                 summary_dict["rest day"] = rest_day_value.strip().lower()
             else:
-                summary_dict["rest day"] = "0 rest days per month"
+                summary_dict["rest day"] = "1 rest days per month"
         except Exception as e:
             print(e)
 
