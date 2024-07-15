@@ -16,7 +16,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from flask_cors import CORS
-from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_text, get_summary_from_text_test )
+from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_text, get_summary_from_text_gpt4o, get_summary_from_text_test )
 from anthropic_api.utils.utils import ( get_summary_from_image_using_claude )
 
 from custom_prompt.utils.utils import read_custom_prompt
@@ -69,6 +69,10 @@ progress = {}
 image_fullpath_with_face_list = []
 maidrefcode_list = []
 
+def count_words(input_string):
+    # Split the input string by whitespace and count the number of elements
+    words = input_string.split()
+    return len(words)
 
 # Function to process each data item
 def uppercase_the_first_letter(item):
@@ -190,10 +194,21 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         total_summary += custom_prompt + "\n"
 
-        print("Sending text to OpenAI  GPT3.5...")
-        save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT3.5...")
+        # Count words in the input string
+        word_count = count_words(total_summary)
 
-        summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
+        print(f"word count: {word_count}")
+        save_log(os.path.join(output_folder, "logs.txt"),f"word count: {word_count} , gpt3.5 words limit is 3000")
+        
+        # Check word count and print appropriate message
+        if word_count <= 2900:
+            print("Sending text to OpenAI  GPT3.5...")
+            save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT3.5...")
+            summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
+        else:
+            save_log(os.path.join(output_folder, "logs.txt"),"Words limit exceeds..switching to GPT4o")
+            save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT4o...")
+            summary_text = get_summary_from_text_gpt4o(total_summary) ## summary text from gpt4o
 
 
         # Extracting values and updating summary_dict
@@ -262,6 +277,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         except Exception as e:
             print(e)
 
+
         try:
             maid_preferred_rest_day_id_value = summary_dict.get("maid preferred rest day id", "")
             if maid_preferred_rest_day_id_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
@@ -271,8 +287,48 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         except Exception as e:
             print(e)
 
-        ##================================================================================##
 
+        try:
+            # Define the marker strings before and after maid employment history
+            start_marker = '[maid employment history]:'
+            end_marker = '\n['
+
+            # Find the start and end positions of the maid employment history section
+            start_pos = summary_text.find(start_marker)
+            end_pos = summary_text.find(end_marker, start_pos)
+
+            # Extract the maid employment history section
+            if start_pos != -1 and end_pos != -1:
+                maid_employment_history = summary_text[start_pos + len(start_marker):end_pos].strip()
+                # print(maid_employment_history)
+                summary_dict["maid employment history"] = maid_employment_history
+            else:
+                print("No maid employment history found in the input.")
+        except Exception as e:
+            print(e)
+
+
+        try:
+            # Define the marker strings before and after maid introduction
+            start_marker = '[maid introduction]:'
+            end_marker = '\n['
+
+            # Find the start and end positions of the maid introduction section
+            start_pos = summary_text.find(start_marker)
+            end_pos = summary_text.find(end_marker, start_pos)
+
+            # Extract the maid introduction section
+            if start_pos != -1 and end_pos != -1:
+                maid_introduction = summary_text[start_pos + len(start_marker):end_pos].strip()
+                # print(maid_introduction)
+                summary_dict["maid introduction"] = maid_introduction
+            else:
+                print("No maid introduction found in the input.")
+
+        except Exception as e:
+            print(e)
+
+        ##================================================================================##
 
         # Creating values_array based on summary_dict
         values_array = []

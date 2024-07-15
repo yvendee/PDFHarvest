@@ -64,7 +64,7 @@ Complete the following structure, the first option is the default value, now rem
 [AdditionalInfo Willing to wash car?]: x , #yes/no
 [Experience Singaporean Experience]: x , #yes/no
 [maid introduction]: x ,
-[maid employment history]: x , #if possible, will also capture the other data like the date, country and years.
+[maid employment history]: x , # extract all the details such as date, country, employer, work duties (make it specific), remarks and isolate each.
 [maid status]: Published
 [employment status id]: x , #Employed|Reserved|Booked|Repatriated|Unemployed if not found or invalid
 [Language Mandarin|Chinese Dialect Experience]: x , #Mandarin|Chinese Dialect

@@ -68,7 +68,8 @@ def get_summary_from_image_using_claude(image_path):
         model="claude-3-haiku-20240307",
         max_tokens=1000,
         temperature=0,
-        system="Please analyze the image  and extract relevant information such as objects, text, and any notable features",
+        # system="Please analyze the image  and extract relevant information such as objects, text, and any notable features",
+        system="Please analyze the image and extract relevant information such as objects, text, and any notable features. For any tables detected, extract text word by word.",
         messages=[
             {
                 "role": "user",
@@ -82,7 +83,7 @@ def get_summary_from_image_using_claude(image_path):
                         "source": {
                             "type": "base64",
                             "media_type": "image/jpeg",
-                            "data": base64_image  # Replace with your base64 encoded image
+                            "data": base64_gray_image  # Replace with your base64 encoded image
                         }
                     }
                 ]
