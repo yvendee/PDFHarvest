@@ -724,7 +724,8 @@ def fetch_logs(session_id):
             logs_content = file.read()
         return logs_content
     except Exception as e:
-        return str(e), 500  # Return error message and HTTP status code 500 for server error
+        # return str(e), 500  # Return error message and HTTP status code 500 for server error
+        return "Waiting for the log.txt to be available", 500  # Return error message and HTTP status code 500 for server error
 
 
 @app.route('/save-csv')

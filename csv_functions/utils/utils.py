@@ -2,7 +2,7 @@ import os
 import re
 
 # Define accepted characters as a regular expression pattern
-accepted_chars_pattern = r'[ &_$a-zA-Z0-9\(\)\-\~\/\\\<\>=\.\@\":;+]'
+accepted_chars_pattern = r'[ &_$a-zA-Z0-9\(\)\-\~\/\\\<\>=\.\@\":;+|]'
 
 
 def filter_accepted_chars(item):
@@ -12,6 +12,7 @@ def filter_accepted_chars(item):
 def save_csv(filename, header, data):
     # Replace spaces with underscores in headers
     header = [column.replace(' ', '_') for column in header]
+    header = [filter_accepted_chars(item) for item in header]
 
     # Check if the file exists
     file_exists = os.path.exists(filename)
