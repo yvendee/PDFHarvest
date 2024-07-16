@@ -98,6 +98,10 @@ def get_summary_from_image_using_claude(image_path):
 
     rtn_list = message.content
     rtn_str = str(rtn_list)
+
+    rtn_str = rtn_str.replace("[TextBlock(text='","").replace("', type='text')]","\n")
+    rtn_str = rtn_str.replace('[TextBlock(text="',"").replace(", type='text')]","\n")
+
     return rtn_str
 
   except Exception as e:
