@@ -139,14 +139,14 @@ def get_summary_from_image(image_path):
     # Convert image to grayscale
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # # Resize image to a smaller size
-    # scale_percent = 50  # percent of original size
-    # width = int(gray_img.shape[1] * scale_percent / 100)
-    # height = int(gray_img.shape[0] * scale_percent / 100)
-    # small_gray_img = cv2.resize(gray_img, (width, height), interpolation=cv2.INTER_AREA)
+    # Resize image to a smaller size
+    scale_percent = 50  # percent of original size
+    width = int(gray_img.shape[1] * scale_percent / 100)
+    height = int(gray_img.shape[0] * scale_percent / 100)
+    small_gray_img = cv2.resize(gray_img, (width, height), interpolation=cv2.INTER_AREA)
 
     # Encode grayscale image to base64
-    _, buffer = cv2.imencode('.jpg', gray_img)
+    _, buffer = cv2.imencode('.jpg', small_gray_img)
     base64_gray_image = base64.b64encode(buffer).decode('utf-8')
 
     # Construct the image URL payload
