@@ -1,11 +1,6 @@
-create a structured paired value text by like this y as keys and x  as values and z as comment or options,
+Create structured output in the following format, ensuring each line adheres to the specified structure. Remove any comments in the final output.
 
-[y1]: x1 , #z1
-[y2]: x2 , #z2
-
-Complete the following structure, the first option is the default value, now remove the comment like x #fullname and more in final output:
-
-[maid name]: x , #fullname
+[maid name]: x , ##Get this value from the 'Name'
 [maid ref code]: x , #If the reference code is not found, generate it using the first two letters of the name
 [maid type option id]: x , #Ex Maid|Transfer. return "New Maid" if not found
 [maid agency]: x , #if not found, leave as null
@@ -39,33 +34,34 @@ Complete the following structure, the first option is the default value, now rem
 [language english experience]: x , #in years
 [language english stars]: x ,
 [languages observations]: x ,
-[expertise care for infant|children experience – willing?]: x , #yes/no
-[expertise care for infant|children experience]: x , #yes/no
+[expertise care for infant|children experience – willing?]: x , #yes or no
+[expertise care for infant|children experience]: x , #yes or no only
 [expertise care for infant|children stars]: x ,
-[expertise care for elderly experience – willing?]: x , #yes/no
-[expertise care for elderly experience]: x , #yes/no
+[expertise care for elderly experience – willing?]: x , #yes or no only
+[expertise care for elderly experience]: x , #yes or no only
 [expertise care for elderly stars]: x ,
-[expertise care for disabled experience – willing?]: x , #yes/no
-[expertise care for disabled experience]: x , #yes/no
+[expertise care for disabled experience – willing?]: x , #yes or no only
+[expertise care for disabled experience]: x , #yes or no only
 [expertise care for disabled stars]: x , 
-[expertise general housework experience – willing?]: x , #yes/no
-[expertise general housework experience]: x ,
+[expertise general housework experience – willing?]: x , #yes or no only
+[expertise general housework experience]: x , #yes or no only
 [expertise general housework stars]: x ,
-[expertise cooking experience – willing?]: x , #yes/no
-[expertise cooking experience]: x ,
+[expertise cooking experience – willing?]: x , #yes or no only
+[expertise cooking experience]: x , #yes or no only
 [expertise cooking stars]: x ,
 [skills observations]: x ,
-[additional info able to handle pork?]: x , #yes/no
-[additional info able to eat pork?]: x , #yes/no
-[additional info able to handle beef?]: x , #yes/no
-[additional info able to care dog|cat?]: x , #yes/no
-[additional info able to do gardening work?]: x , #yes/no
-[additional info able to do simple sewing?]: x , #yes/no
-[additional info willing to wash car?]: x , #yes/no
-[experience Singaporean experience]: x , #yes/no
+[additional info able to handle pork?]: x , #yes or no only
+[additional info able to eat pork?]: x , #yes or no only
+[additional info able to handle beef?]: x , #yes or no only
+[additional info able to care dog|cat?]: x , #yes or no only
+[additional info able to do gardening work?]: x , #yes or no only
+[additional info able to do simple sewing?]: x , #yes or no only
+[additional info willing to wash car?]: x , #yes or no only
+[experience singaporean experience]: x , #yes or no only
 [maid introduction]: x ,
 [maid employment history]: x , 
-# Copy all details from Employment History Overseas table exactly as they appear.
+# Copy all details from "Employment History Overseas table" or "Employment History
+" exactly as they appear.
 # Include date, country, employer, work duties, and remarks without any alterations.
 # the structure like this:
 # - date: {date_value}
