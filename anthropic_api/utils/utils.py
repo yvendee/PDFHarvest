@@ -66,6 +66,7 @@ def get_summary_from_image_using_claude(image_path):
     message = client.messages.create(
         # model="claude-3-opus-20240229",
         model="claude-3-haiku-20240307",
+        # model="claude-3-sonnet-20240229",
         max_tokens=4096,
         temperature=0.7,
         system="Please analyze the image  and extract relevant information such as objects, text, and any notable features",

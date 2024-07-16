@@ -51,15 +51,17 @@ def get_summary_from_text(summarized_string):
   response = client.chat.completions.create(
     model="gpt-3.5-turbo",
     messages=[
-        {"role": "system", "content": "Please create structured output in the following format, ensuring each line adheres to the specified structure."},
+        {"role": "system", "content": "You are an assistant that helps generate structured text output in a specific format. Always follow the structure and instructions provided."},
         {"role": "user", "content": summarized_string}
     ],
-    temperature=0.2,
+    temperature=0.3,
     max_tokens=4096,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0
+    top_p=0.9,
+    frequency_penalty=0.1,
+    presence_penalty=0.1
   )
+
+
 
   print("[Success] Sending text to OpenAI GPT3.5")
   save_log(os.path.join(LOGPATH, "logs.txt"),"[Success] Sending text to OpenAI GPT3.5")
@@ -86,16 +88,16 @@ def get_summary_from_text_gpt4o(summarized_string):
   client = OpenAI()
 
   response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-3.5-turbo-0125",
     messages=[
-        {"role": "system", "content": "Please create structured output in the following format, ensuring each line adheres to the specified structure."},
+        {"role": "system", "content": "You are an assistant that helps generate structured text output in a specific format. Always follow the structure and instructions provided."},
         {"role": "user", "content": summarized_string}
     ],
-    temperature=0.2,
-    max_tokens=4095,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0
+    temperature=0.3,
+    max_tokens=4096,
+    top_p=0.9,
+    frequency_penalty=0.1,
+    presence_penalty=0.1
   )
 
   print("[Success] Sending text to OpenAI GPT3.5")
@@ -168,7 +170,7 @@ def get_summary_from_image(image_path):
           "content": [
             {
               "type": "text",
-              "text": "Please analyze the image and extract relevant information such as objects, text, and any notable features"
+              "text": "You are an OCR tool. Your task is to extract and transcribe text, checkboxes, and tables exactly as they appear in the images provided, without summarizing or altering any content. Maintain the exact formatting, punctuation, line breaks, and represent checkboxes and tables accurately."
             }
           ]
         },
@@ -177,7 +179,9 @@ def get_summary_from_image(image_path):
           "content": [
               {
                   "type": "text",
-                  "text": "Extract all the text data. For any tables detected, extract text word by word."
+                  "text": """Extract and transcribe the content from the provided image exactly as it appears. This includes text, checkboxes, and tables. Do not summarize or alter any content. Maintain the exact formatting, punctuation, line breaks, and represent checkboxes and tables accurately.
+                            - For checkboxes, use "[ ]" for unchecked and "[x]" for checked.
+                            - For tables, preserve the structure with rows and columns as seen in the image."""
               },
               image_url_payload
           ]
