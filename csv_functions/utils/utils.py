@@ -26,9 +26,11 @@ def save_csv(filename, header, data):
             if item_lower == unwanted:
                 return ""
                 
+        # Check if any unwanted value is in item_lower
         # Therefore, if item_lower is " language english experience null, ", the process_data_item function will return ""
-        if unwanted_values  in item_lower:
-            return ""
+        for unwanted in unwanted_values:
+            if unwanted in item_lower:
+                return ""
 
         # Filter accepted characters
         filtered_item = filter_accepted_chars(item)
