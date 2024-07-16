@@ -2,7 +2,7 @@ import os
 import re
 
 # Define accepted characters as a regular expression pattern
-accepted_chars_pattern = r'[ &_$a-zA-Z0-9\(\)\-\~\/\\\<\>=\.\@\":;+|]'
+accepted_chars_pattern = r'[ &_$a-zA-Z0-9\(\)\-\~\/\\\<\>=\.\@:;+|]'
 
 def filter_accepted_chars(item):
     # Use regular expression to filter out unwanted characters
