@@ -54,7 +54,7 @@ def get_summary_from_text(summarized_string):
         {"role": "system", "content": "Please analyze the document text"},
         {"role": "user", "content": summarized_string}
     ],
-    temperature=0.5,
+    temperature=0.2,
     max_tokens=4096,
     top_p=1,
     frequency_penalty=0,
@@ -91,7 +91,7 @@ def get_summary_from_text_gpt4o(summarized_string):
         {"role": "system", "content": "Please analyze the document text"},
         {"role": "user", "content": summarized_string}
     ],
-    temperature=0.7,
+    temperature=0.2,
     max_tokens=4095,
     top_p=1,
     frequency_penalty=0,
