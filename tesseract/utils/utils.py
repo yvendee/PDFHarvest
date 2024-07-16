@@ -18,10 +18,21 @@ def extract_text_from_image(filepath):
         img = cv2.resize(img, (1050, 1680))
         
         text = pytesseract.image_to_string(img)
+
+
+
+        img = cv2.resize(img, (1366, 1366))
+        
+        text2 = pytesseract.image_to_string(img)
+
+        text = text2 + '\n'
+
+        
+
         
         # Remove trailing and unwanted characters, allow whitespace and newlines
-        text = text.strip()  # Remove leading and trailing whitespace
-        text = text.replace("\n", " ")  # Replace newline characters with a space
+        # text = text.strip()  # Remove leading and trailing whitespace
+        # text = text.replace("\n", " ")  # Replace newline characters with a space
         
         # Get the basename of the file
         filename = os.path.basename(filepath)

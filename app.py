@@ -128,7 +128,6 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     # Open the PDF file
     pdf_document = fitz.open(pdf_file)
 
-
     save_log(os.path.join(output_folder, "logs.txt"),f"Opening pdf file: {pdf_file}")
     
     # List to store the filenames of the images for each page
@@ -187,7 +186,11 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     matches_list = [match for match in matches_list if match not in ["y1", "y2"]]   
 
     # Initialize summary_dict based on matches_list
-    summary_dict = {match: "" for match in matches_list}
+    # summary_dict = {match: "" for match in matches_list}
+
+    # Initialize summary_dict with lowercase keys based on matches_list
+    summary_dict = {match.lower(): "Null" for match in matches_list}
+
     # print(summary_dict)
 
     if custom_prompt not in ["Not Found", "Read Error"]:
@@ -224,6 +227,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         ##=========== Special Case Here For Initial Setting of Key Values ================##
 
+
         try:
             # Getting the value corresponding to the key "maid ref code"" then stored
             maid_ref_code_value = summary_dict.get("maid ref code", "")
@@ -234,6 +238,16 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             ## append to maidrefcode_list for renaming of extracted inage with  face
             maidrefcode_list.append(maid_ref_code_value)
             summary_dict["maid ref code"] = maid_ref_code_value
+        except Exception as e:
+            print(e)
+
+        try:
+            # Getting the value corresponding to the key "maid type option id"" then stored
+            maid_type_option_id_value = summary_dict.get("maid type option id", "")
+            if maid_type_option_id_value.strip().lower() in ["ex maid", "transfer"]:
+                summary_dict["maid type option id"] = maid_type_option_id_value.strip().lower()
+            else:
+                summary_dict["maid type option id"] = "New Maid"
         except Exception as e:
             print(e)
 
@@ -260,11 +274,27 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
 
         try:
+            # Getting the value corresponding to the key "marital status id"" then stored
+            marital_status_id_value = summary_dict.get("marital status id", "")
+            if marital_status_id_value.strip().lower() in ["single", "married" ,"divorced"]:
+                summary_dict["marital status id"] = marital_status_id_value.strip().lower()
+            else:
+                summary_dict["marital status id"] = "Single"
+        except Exception as e:
+            print(e)
+
+        try:
             rest_day_value = summary_dict.get("rest day", "")
-            if rest_day_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
+            
+            if "all sun" in rest_day_value.strip().lower():
+                summary_dict["rest day"] = "4 rest days per month"
+            
+            elif rest_day_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
                 summary_dict["rest day"] = rest_day_value.strip().lower()
+            
             else:
                 summary_dict["rest day"] = "1 rest days per month"
+            
         except Exception as e:
             print(e)
 
@@ -280,7 +310,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         try:
             maid_preferred_rest_day_id_value = summary_dict.get("maid preferred rest day id", "")
-            if maid_preferred_rest_day_id_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
+            if "all sun" in maid_preferred_rest_day_id_value.strip().lower():
+                summary_dict["maid preferred rest day id"] = "4 rest days per month"
+            elif maid_preferred_rest_day_id_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
                 summary_dict["maid preferred rest day id"] = maid_preferred_rest_day_id_value.strip().lower()
             else:
                 summary_dict["maid preferred rest day id"] = "1 rest days per month"

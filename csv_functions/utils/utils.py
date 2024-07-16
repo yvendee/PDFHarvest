@@ -4,7 +4,6 @@ import re
 # Define accepted characters as a regular expression pattern
 accepted_chars_pattern = r'[ &_$a-zA-Z0-9\(\)\-\~\/\\\<\>=\.\@\":;+|]'
 
-
 def filter_accepted_chars(item):
     # Use regular expression to filter out unwanted characters
     return ''.join(re.findall(accepted_chars_pattern, item))
@@ -19,7 +18,7 @@ def save_csv(filename, header, data):
 
     # Function to process each data item
     def process_data_item(item):
-        unwanted_values = ["not provided", "n/a", "null", "not found", "not-found", "not specified", "not applicable"]
+        unwanted_values = ["not provided", "n/a", "null", "not found", "not-found", "not specified", "not applicable", "none", "not mentioned", "not-mentioned", "not evaluated"]
         item_lower = item.strip().lower()
         
         # Check for unwanted values

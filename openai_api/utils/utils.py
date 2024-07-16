@@ -51,10 +51,10 @@ def get_summary_from_text(summarized_string):
   response = client.chat.completions.create(
     model="gpt-3.5-turbo",
     messages=[
-        {"role": "system", "content": "Please analyze the summarized text and extract relevant information."},
+        {"role": "system", "content": "Please analyze the document text"},
         {"role": "user", "content": summarized_string}
     ],
-    temperature=0.7,
+    temperature=0.5,
     max_tokens=4096,
     top_p=1,
     frequency_penalty=0,
@@ -88,7 +88,7 @@ def get_summary_from_text_gpt4o(summarized_string):
   response = client.chat.completions.create(
     model="gpt-4o",
     messages=[
-        {"role": "system", "content": "Please analyze the summarized text and extract relevant information."},
+        {"role": "system", "content": "Please analyze the document text"},
         {"role": "user", "content": summarized_string}
     ],
     temperature=0.7,
@@ -137,14 +137,14 @@ def get_summary_from_image(image_path):
     # Convert image to grayscale
     gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # Resize image to a smaller size
-    scale_percent = 50  # percent of original size
-    width = int(gray_img.shape[1] * scale_percent / 100)
-    height = int(gray_img.shape[0] * scale_percent / 100)
-    small_gray_img = cv2.resize(gray_img, (width, height), interpolation=cv2.INTER_AREA)
+    # # Resize image to a smaller size
+    # scale_percent = 50  # percent of original size
+    # width = int(gray_img.shape[1] * scale_percent / 100)
+    # height = int(gray_img.shape[0] * scale_percent / 100)
+    # small_gray_img = cv2.resize(gray_img, (width, height), interpolation=cv2.INTER_AREA)
 
     # Encode grayscale image to base64
-    _, buffer = cv2.imencode('.jpg', small_gray_img)
+    _, buffer = cv2.imencode('.jpg', gray_img)
     base64_gray_image = base64.b64encode(buffer).decode('utf-8')
 
     # Construct the image URL payload
@@ -168,8 +168,7 @@ def get_summary_from_image(image_path):
           "content": [
             {
               "type": "text",
-              # "text": "Please analyze the image and extract relevant information such as objects, text, and any notable features"
-              "text": "Please analyze the image and extract relevant information such as objects, text, and any notable features. For any tables detected, extract text word by word."
+              "text": "Please analyze the image and extract relevant information such as objects, text, and any notable features"
             }
           ]
         },
@@ -178,7 +177,7 @@ def get_summary_from_image(image_path):
           "content": [
               {
                   "type": "text",
-                  "text": "Do a summary for the image\n"
+                  "text": "Extract all the text data. For any tables detected, extract text word by word."
               },
               image_url_payload
           ]
