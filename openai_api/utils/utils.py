@@ -51,7 +51,7 @@ def get_summary_from_text(summarized_string):
   response = client.chat.completions.create(
     model="gpt-3.5-turbo",
     messages=[
-        {"role": "system", "content": "You are an assistant that helps generate structured text output in a specific format. Always follow the structure and instructions provided."},
+        {"role": "system", "content": "You are an assistant that generates structured text output in a specific format. Always follow the structure and instructions provided without omitting any elements."},
         {"role": "user", "content": summarized_string}
     ],
     temperature=0.3,
@@ -90,7 +90,7 @@ def get_summary_from_text_gpt4o(summarized_string):
   response = client.chat.completions.create(
     model="gpt-3.5-turbo-0125",
     messages=[
-        {"role": "system", "content": "You are an assistant that helps generate structured text output in a specific format. Always follow the structure and instructions provided."},
+        {"role": "system", "content": "You are an assistant that generates structured text output in a specific format. Always follow the structure and instructions provided without omitting any elements."},
         {"role": "user", "content": summarized_string}
     ],
     temperature=0.3,

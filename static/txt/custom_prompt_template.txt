@@ -1,4 +1,14 @@
-Create structured output in the following format, ensuring each line adheres to the specified structure. Remove any comments in the final output.
+Create structured output in the following format, ensuring each line adheres to the specified structure. Do not omit any brackets or any other elements. Follow this exact format:
+Example:
+
+[maid name]: ARROGANTE GERILIZA RUFINO
+[maid ref code]: AR
+[maid type option id]: New Maid
+[maid agency]: null
+[availability status id]: Others
+[nationality id]: Filipino
+
+Complete this:
 
 [maid name]: x , ##Get this value from the 'Name'
 [maid ref code]: x , #If the reference code is not found, generate it using the first two letters of the name
