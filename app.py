@@ -236,6 +236,16 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             # Append the random number to maid_ref_code_value
             maid_ref_code_value += str(random_number)
             ## append to maidrefcode_list for renaming of extracted inage with  face
+
+            # Remove unwanted characters 
+            pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
+    
+            # Replace all characters not matching the pattern with whitespace
+            maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+            
+            # Remove all whitespace from the cleaned string
+            maid_ref_code_value = ''.join(maid_ref_code_value.split())
+
             maidrefcode_list.append(maid_ref_code_value)
             summary_dict["maid ref code"] = maid_ref_code_value
         except Exception as e:
