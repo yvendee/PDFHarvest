@@ -9,49 +9,49 @@ Complete this:
 [availability status id]: x , #One week|2 Weeks|4 5weeks|5 6weeks|Immediate. return "Others" if not found
 [nationality id]: x , #Filipino|Indonesian|Myanmarese|Indian|Bangladeshi|Sri Lankan|Cambodian|Thai|Malaysian
 [birth date]: x , # the date format is dd/MM/YYYY
-[birth place]: x ,
+[birth place]: x , # if not found, return "null"
 [siblings count]: x , #Get this value from the 'Number of siblings'
-[children count]: x ,
-[children ages]: x ,
+[children count]: x , # if not found, return "null"
+[children ages]: x , # if not found, return "null"
 [height]: x , #in cm and remove units and If not found just set "150"
 [weight]: x , #in kg and remove units and If not found just set "Null"
 [rest day]: x,  #  1 | 2 | 3 | 4 | 0 rest days per month
 [religion id]: x , #Buddhist|Catholic|Christian|Free Thinker|Hindu|Muslim|Sikh|Others if invalid or not found
-[marital status id]: x ,
+[marital status id]: x , # if not found, return "null"
 [education id]: x , #Secondary level (8~9 yrs)|High School (10~12 yrs)|College/Degree (>=13 yrs)|Others if not found or invalid
 [education info]: x , # more detailed or same value of "education id"
-[maid current salary]: x ,
+[maid current salary]: x , # if not found, return "null"
 [maid current rest day id]: x , #1 rest days per month|2 rest days per month|3 rest days per month|4 rest days per month|0 rest days per month, return 0 rest days per month if not found or invalid
 [maid preferred rest day id]: x , #1 rest days per month|2 rest days per month|3 rest days per month|4 rest days per month|0 rest days per month, return 0 rest days per month if not found or invalid
-[home address]: x ,
-[home number]: x ,
-[home contacts]: x ,
-[repatriate]: x ,
-[maid passport number]: x ,
-[maid passport expiry]: x ,
-[maid work permit number]: x ,
-[maid work permit expiry]: x ,
-[is youtube video]: x ,
-[youtube link]: x ,
+[home address]: x , # if not found, return "null"
+[home number]: x , # if not found, return "null"
+[home contacts]: x , # if not found, return "null"
+[repatriate]: x , # if not found, return "null"
+[maid passport number]: x , # if not found, return "null"
+[maid passport expiry]: x , # if not found, return "null"
+[maid work permit number]: x , # if not found, return "null"
+[maid work permit expiry]: x , # if not found, return "null"
+[is youtube video]: x , # if not found, return "null"
+[youtube link]: x , # if not found, return "null"
 [language english experience]: x , #in years
-[language english stars]: x ,
-[languages observations]: x ,
+[language english stars]: x , # if not found, return "null"
+[languages observations]: x , # if not found, return "null"
 [expertise care for infant|children experience – willing?]: x , #yes or no
 [expertise care for infant|children experience]: x , #yes or no only
-[expertise care for infant|children stars]: x ,
+[expertise care for infant|children stars]: x , # if not found, return "null"
 [expertise care for elderly experience – willing?]: x , #yes or no only
 [expertise care for elderly experience]: x , #yes or no only
-[expertise care for elderly stars]: x ,
+[expertise care for elderly stars]: x , # if not found, return "null"
 [expertise care for disabled experience – willing?]: x , #yes or no only
 [expertise care for disabled experience]: x , #yes or no only
-[expertise care for disabled stars]: x , 
+[expertise care for disabled stars]: x , # if not found, return "null"
 [expertise general housework experience – willing?]: x , #yes or no only
 [expertise general housework experience]: x , #yes or no only
-[expertise general housework stars]: x ,
+[expertise general housework stars]: x , # if not found, return "null"
 [expertise cooking experience – willing?]: x , #yes or no only
 [expertise cooking experience]: x , #yes or no only
-[expertise cooking stars]: x ,
-[skills observations]: x ,
+[expertise cooking stars]: x , # if not found, return "null"
+[skills observations]: x , # if not found, return "null"
 [additional info able to handle pork?]: x , #yes or no only
 [additional info able to eat pork?]: x , #yes or no only
 [additional info able to handle beef?]: x , #yes or no only
@@ -60,8 +60,8 @@ Complete this:
 [additional info able to do simple sewing?]: x , #yes or no only
 [additional info willing to wash car?]: x , #yes or no only
 [experience singaporean experience]: x , #yes or no only
-[maid introduction]: x ,
-[maid employment history]: x , 
+[maid introduction]: x , # if not found, return "null"
+[maid employment history]: x ,
 # Copy all details from "Employment History Overseas table" or "Employment History
 " exactly as they appear.
 # Include date, country, employer, work duties, and remarks without any alterations.
@@ -74,5 +74,5 @@ Complete this:
 [maid status]: Published
 [employment status id]: x , #Employed|Reserved|Booked|Repatriated|Unemployed if not found or invalid
 [language mandarin|chinese dialect experience]: x , #mandarin|chinese dialect
-[language mandarin|chinese dialect stars]: x ,
+[language mandarin|chinese dialect stars]: x , # if not found, return "null"
 [experience others experience]: x, #not-found
