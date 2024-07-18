@@ -383,16 +383,21 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         try:
             rest_day_value = summary_dict.get("rest day", "")
-            
-            if "all sun" in rest_day_value.strip().lower():
+            rest_day_lower = rest_day_value.strip().lower()
+
+            # List of conditions to check
+            special_conditions = ["all sun", "weekly off"]
+
+            # Check if any special condition exists in rest_day_lower
+            if any(condition in rest_day_lower for condition in special_conditions):
                 summary_dict["rest day"] = "4 rest days per month"
-            
-            elif rest_day_value.strip().lower() in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
-                summary_dict["rest day"] = rest_day_value.strip().lower()
+
+            elif rest_day_lower in ["1 rest days per month", "2 rest days per month", "3 rest days per month", "4 rest days per month"]:
+                summary_dict["rest day"] = rest_day_lower
             
             else:
                 summary_dict["rest day"] = "1 rest days per month"
-            
+
         except Exception as e:
             print(e)
 
