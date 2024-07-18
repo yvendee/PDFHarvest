@@ -227,12 +227,76 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         ##=========== Special Case Here For Initial Setting of Key Values ================##
 
-
+        Is_incorrect_birth_date = "no"
         try:
-            # Getting the value corresponding to the key "maid ref code"" then stored
+            birthdate_value = summary_dict.get("birth date", "")  # assuming format is 'DD/MM/YYYY'
+            birthdate_value = birthdate_value.strip()
             maid_ref_code_value = summary_dict.get("maid ref code", "")
+
+            # Check if birthdate_value is empty or incorrectly formatted
+            if birthdate_value:
+                if len(birthdate_value) != 10 or birthdate_value[2] != '/' or birthdate_value[5] != '/':
+                    print("incorrect birth date format")
+                    formatted_birthdate = ""
+                    Is_incorrect_birth_date = "yes"
+                else:
+                    try:
+                        day, month, year = birthdate_value.split('/')
+                        
+                        # Format the maid ref "YYMMDD"
+                        formatted_birthdate = f"{year[-2:]}{month.zfill(2)}{day.zfill(2)}"
+
+                    except ValueError:
+                        print("incorrect birth date format")
+                        formatted_birthdate = ""
+                        Is_incorrect_birth_date = "yes"
+            else:
+                print("incorrect birth date format")
+                formatted_birthdate = ""
+                Is_incorrect_birth_date = "yes"
+
+            # Append formatted_birthdate to maid_ref_code_value
+            maid_ref_code_value += formatted_birthdate
+
+            if(Is_incorrect_birth_date == "no"):
+                # Remove unwanted characters 
+                pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
+        
+                # Replace all characters not matching the pattern with whitespace
+                maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+
+                # Remove all whitespace from the cleaned string
+                maid_ref_code_value = ''.join(maid_ref_code_value.split())
+
+                maidrefcode_list.append(maid_ref_code_value)
+                summary_dict["maid ref code"] = maid_ref_code_value
+
+            else:
+                # Generate a 6-digit random number
+                random_number = random.randint(100000, 999999)
+
+                # Append the random number to maid_ref_code_value
+                maid_ref_code_value += str(random_number)
+                ## append to maidrefcode_list for renaming of extracted inage with  face
+
+                # Remove unwanted characters 
+                pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
+        
+                # Replace all characters not matching the pattern with whitespace
+                maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+                
+                # Remove all whitespace from the cleaned string
+                maid_ref_code_value = ''.join(maid_ref_code_value.split())
+
+                maidrefcode_list.append(maid_ref_code_value)
+                summary_dict["maid ref code"] = maid_ref_code_value
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
             # Generate a 6-digit random number
             random_number = random.randint(100000, 999999)
+
             # Append the random number to maid_ref_code_value
             maid_ref_code_value += str(random_number)
             ## append to maidrefcode_list for renaming of extracted inage with  face
@@ -248,8 +312,32 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
             maidrefcode_list.append(maid_ref_code_value)
             summary_dict["maid ref code"] = maid_ref_code_value
-        except Exception as e:
-            print(e)
+
+        
+
+        # try:
+        #     # Getting the value corresponding to the key "maid ref code"" then stored
+        #     maid_ref_code_value = summary_dict.get("maid ref code", "")
+        #     # Generate a 6-digit random number
+        #     random_number = random.randint(100000, 999999)
+        #     # Append the random number to maid_ref_code_value
+        #     maid_ref_code_value += str(random_number)
+        #     ## append to maidrefcode_list for renaming of extracted inage with  face
+
+        #     # Remove unwanted characters 
+        #     pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
+    
+        #     # Replace all characters not matching the pattern with whitespace
+        #     maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+            
+        #     # Remove all whitespace from the cleaned string
+        #     maid_ref_code_value = ''.join(maid_ref_code_value.split())
+
+        #     maidrefcode_list.append(maid_ref_code_value)
+        #     summary_dict["maid ref code"] = maid_ref_code_value
+        # except Exception as e:
+        #     print(e)
+
 
         try:
             # Getting the value corresponding to the key "maid type option id"" then stored
