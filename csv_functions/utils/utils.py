@@ -109,9 +109,12 @@ def save_csv(filename, header, data):
                 
         # Check if any unwanted value is in item_lower
         # Therefore, if item_lower is " language english experience null, ", the process_data_item function will return ""
-        for unwanted in unwanted_values:
-            if unwanted in item_lower:
-                return ""
+
+        if len(item_lower) <= 17: ## to make sure that it will not affect a item's value has long content like "maid employment history" or others
+            # Execute the block only if item_lower is 17 characters or shorter
+            for unwanted in unwanted_values:
+                if unwanted in item_lower:
+                    return ""  # Return empty string if unwanted value is found
 
         # Filter accepted characters
         filtered_item = filter_accepted_chars(item)
