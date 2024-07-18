@@ -22,18 +22,16 @@ def save_csv(filename, header, data):
         if header[i] == 'language_english_stars':
             header[i] = 'Language-English-stars'
         if header[i] == 'expertise_care_for_infant|children_experience__willing':
-            header[i] = 'Expertise-Care for Infant/Children-Experience – Willing?'
+            header[i] = 'Expertise-Care for Infant/Children-Experience - Willing?'
         if header[i] == 'expertise_care_for_infant|children_experience_willing':
-            header[i] = 'Expertise-Care for Infant/Children-Experience – Willing?'
+            header[i] = 'Expertise-Care for Infant/Children-Experience - Willing?'
         if header[i] == 'expertise_care_for_infant|children_experience':
             header[i] = 'Expertise-Care for Infant/Children-Experience'
 
         if header[i] == 'expertise_care_for_infant|children_stars':
             header[i] = 'Expertise-Care for Infant/Children-stars'
         if header[i] == 'expertise_care_for_elderly_experience__willing':
-            header[i] = 'Expertise-Care for Elderly-Experience – Willing?'
-        if header[i] == 'expertise_care_for_elderly_experience_willing':
-            header[i] = 'Expertise-Care for Elderly-Experience – Willing?'
+            header[i] = 'Expertise-Care for Elderly-Experience - Willing?'
 
         if header[i] == 'expertise_care_for_elderly_experience':
             header[i] = 'Expertise-Care for Elderly-Experience'
@@ -41,27 +39,29 @@ def save_csv(filename, header, data):
         if header[i] == 'expertise_care_for_elderly_stars':
             header[i] = 'Expertise-Care for Elderly-stars'
         if header[i] == 'expertise_care_for_disabled_experience__willing':
-            header[i] = 'Expertise-Care for Disabled-Experience – Willing?'
+            header[i] = 'Expertise-Care for Disabled-Experience - Willing?'
         if header[i] == 'expertise_care_for_disabled_experience_willing':
-            header[i] = 'Expertise-Care for Disabled-Experience – Willing?'
+            header[i] = 'Expertise-Care for Disabled-Experience - Willing?'
         
         if header[i] == 'expertise_care_for_disabled_experience':
             header[i] = 'Expertise-Care for Disabled-Experience'
         if header[i] == 'expertise_care_for_disabled_stars':
             header[i] = 'Expertise-Care for Disabled-stars'
         if header[i] == 'expertise_general_housework_experience__willing':
-            header[i] = 'Expertise-General Housework-Experience – Willing?'
+            header[i] = 'Expertise-General Housework-Experience - Willing?'
         if header[i] == 'expertise_general_housework_experience_willing':
-            header[i] = 'Expertise-General Housework-Experience – Willing?'
+            header[i] = 'Expertise-General Housework-Experience - Willing?'
+        if header[i] == 'expertise_general_housework_experience_willing':
+            header[i] = 'Expertise-General Housework-Experience - Willing?'
 
         if header[i] == 'expertise_general_housework_experience':
             header[i] = 'Expertise-General Housework-Experience'
         if header[i] == 'expertise_general_housework_stars':
             header[i] = 'Expertise-General Housework-stars'
         if header[i] == 'expertise_cooking_experience__willing':
-            header[i] = 'Expertise-Cooking-Experience – Willing?'
+            header[i] = 'Expertise-Cooking-Experience - Willing?'
         if header[i] == 'expertise_cooking_experience_willing':
-            header[i] = 'Expertise-Cooking-Experience – Willing?'
+            header[i] = 'Expertise-Cooking-Experience - Willing?'
 
         if header[i] == 'expertise_cooking_experience':
             header[i] = 'Expertise-Cooking-Experience'
