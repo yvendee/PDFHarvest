@@ -38,9 +38,8 @@ def get_summary_from_image_using_claude(image_path):
     # # cv2.waitKey(0)
     # # cv2.destroyAllWindows()
 
-
     # Resize image to a smaller size
-    scale_percent = 50  # percent of original size
+    scale_percent = 100  # percent of original size
     width = int(gray_img.shape[1] * scale_percent / 100)
     height = int(gray_img.shape[0] * scale_percent / 100)
     small_gray_img = cv2.resize(gray_img, (width, height), interpolation=cv2.INTER_AREA)
