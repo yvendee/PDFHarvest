@@ -3,14 +3,14 @@ Create structured output in the following format, ensuring each line adheres to 
 Complete this:
 
 [maid name]: x , ##Get this value from the 'Name'
-[maid ref code]: x , #If the reference code is not found, generate it using the first two letters of the name
-[maid type option id]: x , #Ex Maid|Transfer. return "New Maid" if not found
+[maid ref code]:  x , #If the reference code is not found, generate it using the first two letters of the name
+[maid type option id]: x , #if not specifically stated then use the following logic. If the maid is currently working in Singapore then return “Transfer Maid”, else if maid has worked in Singapore previously then return “Ex Maid”, else return “New Maid”. Make sure to check the employment history for the details.
 [maid agency]: x , #if not found, leave as null
 [availability status id]: x , #One week|2 Weeks|4 5weeks|5 6weeks|Immediate. return "Others" if not found
 [nationality id]: x , #Filipino|Indonesian|Myanmarese|Indian|Bangladeshi|Sri Lankan|Cambodian|Thai|Malaysian
-[birth date]: x , # the date format is dd/MM/YYYY
+[birth date]: x, # The date format is dd/MM/YYYY. Read each of the numbers carefully especially 0, 8, 9 and 6  to ensure accuracy.
 [birth place]: x , # if not found, return "null"
-[siblings count]: x , #Get this value from the 'Number of siblings'
+[siblings count]: x, # Get this value from the 'Number of siblings' field. If it says '1 of 3 siblings', understand it and return the number of siblings, e.g., if you're 1 of 3 siblings means you have 2 siblings.
 [children count]: x , # if not found, return "null"
 [children ages]: x , # if not found, return "null"
 [height]: x , #in cm and remove units and If not found just set "150"
@@ -18,8 +18,8 @@ Complete this:
 [rest day]: x,  #  1 | 2 | 3 | 4 | 0 rest days per month
 [religion id]: x , #Buddhist|Catholic|Christian|Free Thinker|Hindu|Muslim|Sikh|Others if invalid or not found
 [marital status id]: x , # if not found, return "null"
-[education id]: x , #Secondary level (8~9 yrs)|High School (10~12 yrs)|College/Degree (>=13 yrs)|Others if not found or invalid
-[education info]: x , # more detailed or same value of "education id"
+[education id]:  x, #Accepted values: Secondary level (8~9 yrs)|High School (10~12 yrs)|College/Degree (>=13 yrs)|Others. If you understand it as a bachelor in science (e.g., BSC), return "College/Degree (>=13 yrs)." If you understand it as Junior High School or Senior High School, return "High School (10~12 yrs)." If the value is invalid or not found, adjust the format to use ~ instead of hyphens and ensure "yrs" is not capitalized. Match the accepted values. If it still doesn't match, return "Others". 
+[education info]: x , # more detailed
 [maid current salary]: x , # if not found, return "null"
 [maid current rest day id]: x , #1 rest days per month|2 rest days per month|3 rest days per month|4 rest days per month|0 rest days per month, return 0 rest days per month if not found or invalid
 [maid preferred rest day id]: x , #1 rest days per month|2 rest days per month|3 rest days per month|4 rest days per month|0 rest days per month, return 0 rest days per month if not found or invalid
@@ -33,37 +33,37 @@ Complete this:
 [maid work permit expiry]: x , # if not found, return "null"
 [is youtube video]: x , # if not found, return "null"
 [youtube link]: x , # if not found, return "null"
-[language english experience]: x , #in years
-[language english stars]: x , # if not found, return "null"
-[languages observations]: x , # if not found, return "null"
-[expertise care for infant|children experience – willing?]: x , #yes or no
-[expertise care for infant|children experience]: x , #yes or no only
-[expertise care for infant|children stars]: x , # if not found, return "null"
-[expertise care for elderly experience – willing?]: x , #yes or no only
-[expertise care for elderly experience]: x , #yes or no only
-[expertise care for elderly stars]: x , # if not found, return "null"
+[language english experience]: x, # Get the integer number of years from the 'Experience' column in the same row as 'Language abilities (spoken)' and return in the format '2yr 6mo' if years and months are specified or '2yr 0mo' if only years are specified. Check the first table first; if not found or the table is empty, check the second table. If not found, return "0yr 0mo".
+[language english stars]: x, # Get the integer value from the 'Assessment/Observation' column in the same row as the 'Language Abilities (spoken)' entry. It is above the text usually and if not found, return "null". Check the first table first; if not found or the table is empty, check the second table. 
+[languages observations]: x, # Get the value from the 'Please specify' line in the 'Areas of Work' column in the same row as the 'Language abilities (spoken)' entry, followed by the value from the 'Assessment/Observation' column in the same row. Only return the text not the integer. If not found, return "null".
+[expertise care for infant|children experience – willing?]: x , #yes or no. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise care for infant|children experience]: x , #yes or no only, if the value gets "Experienced" or "Experience", return yes; if invalid or not found, return no. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise care for infant|children stars]: x, # Get the integer value from the 'Assessment/Observation' column in the same row as the 'Care of infants/children' entry.  Only return the integer value inside the box. If value is N/a, N.a., or Na, return "null". If not found, return "null". Do not guess or infer the value. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise care for elderly experience – willing?]: x , #yes or no only. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise care for elderly experience]: x , #yes or no only, if it says "Experienced" or "Experience", return yes; if invalid or not found, return no. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise care for elderly stars]: x, # Get the integer value from the 'Assessment/Observation' column in the same row as the 'Care of elderly' entry. Only return the integer value inside the box. If value is N/a, N.a., or Na, return "null". If not found, return "null". Do not guess or infer the value. Check the first table first; if not found or the table is empty, check the second table. 
 [expertise care for disabled experience – willing?]: x , #yes or no only
-[expertise care for disabled experience]: x , #yes or no only
-[expertise care for disabled stars]: x , # if not found, return "null"
-[expertise general housework experience – willing?]: x , #yes or no only
-[expertise general housework experience]: x , #yes or no only
-[expertise general housework stars]: x , # if not found, return "null"
-[expertise cooking experience – willing?]: x , #yes or no only
-[expertise cooking experience]: x , #yes or no only
-[expertise cooking stars]: x , # if not found, return "null"
-[skills observations]: x , # if not found, return "null"
-[additional info able to handle pork?]: x , #yes or no only
+[expertise care for disabled experience]: x , #yes or no only, if the value gets "Experienced" or "Experience", return yes; if invalid or not found, return no. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise care for disabled stars]: x, # Get the integer value from the 'Assessment/Observation' column in the same row as the 'Care of disabled' entry. Only return the integer value inside the box. If value is N/a, N.a., or Na, return "null". If not found, return "null". Do not guess or infer the value. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise general housework experience – willing?]: x , #yes or no only. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise general housework experience]: x , #yes or no only, if the value gets "Experienced" or "Experience", return yes; if invalid or not found, return no. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise general housework stars]: x, # Get the integer value from the 'Assessment/Observation' column in the same row as the 'General housework' entry. Only return the integer value inside the box. If value is N/a, N.a., or Na, return "null". If not found, return "null". Do not guess or infer the value. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise cooking experience – willing?]: x , #yes or no only. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise cooking experience]: x , #yes or no only, if the value gets "Experienced" or "Experience", return yes; if invalid or not found, return no. Check the first table first; if not found or the table is empty, check the second table. 
+[expertise cooking stars]: x, # Get the integer value from the 'Assessment/Observation' column in the same row as the 'Cooking' entry. Only return the integer value inside the box. If value is N/a, N.a., or Na, return "null". If not found, return "null". Do not guess or infer the value. Check the first table first; if not found or the table is empty, check the second table. 
+[skills observations]: x, # Get the value from the 'Please specify' line in the 'Areas of Work' column in the same row as the 'Other skills, if any' entry, followed by the value from the 'Assessment/Observation' column in the same row. Only return the text not the integer. If not found, return "null". Check the first table first; if not found or the table is empty, check the second table. 
+[additional info able to handle pork?]: x , #yes or no only. Check from the 'Food Handling Preferences' section; if 'Others' is checked on the checkbox or it says 'No Preference', return yes; if 'No Pork' is checked on the checkbox, return no; if blank or not checked, return no. Don't guess this part.
 [additional info able to eat pork?]: x , #yes or no only
-[additional info able to handle beef?]: x , #yes or no only
-[additional info able to care dog|cat?]: x , #yes or no only
+[additional info able to handle beef?]: x , #yes or no only. Check from the 'Food Handling Preferences' section; if 'Others' is checked on the checkbox or it says 'No Preference', return yes; if 'No Beef' is checked on the checkbox, return no; if blank or not checked, return no. Don't guess this part.
+[additional info able to care dog|cat?]: x , #yes or no only, 
 [additional info able to do gardening work?]: x , #yes or no only
 [additional info able to do simple sewing?]: x , #yes or no only
 [additional info willing to wash car?]: x , #yes or no only
-[experience singaporean experience]: x , #yes or no only
-[maid introduction]: x , # if not found, return "null"
+[experience singaporean experience]: x, # Return in the format '2 yr 6 mo' or '2 yr'. If not found, return "null".
+[maid introduction]: x, # Get all details under the 'Other Remarks' section only. If not found or Other Remarks is blank or empty, return "null". Don't guess or bring random data.
+
 [maid employment history]: x ,
-# Copy all details from "Employment History Overseas table" or "Employment History
-" exactly as they appear.
+# Copy all details from "Employment History Overseas table" or "Employment History table" exactly as they appear.
 # Include date, country, employer, work duties, and remarks without any alterations.
 # the structure like this:
 # - date: {date_value}
@@ -71,8 +71,10 @@ Complete this:
 # - employer: {employer_value}
 # - work duties: {work_duties_value1, work_value2, ..}
 # - remarks: {remark_value1}
+# If there is no table for Employment History, read through the biodata get all the work experience details. Don't bring random data and random brackets and details.
+
 [maid status]: Published
-[employment status id]: x , #Employed|Reserved|Booked|Repatriated|Unemployed if not found or invalid
+[employment status id]: x, # Employed|Reserved|Booked|Repatriated|Unemployed. Compare today's date with the employment history dates. If there is no current overlap, return "Unemployed". If not found or invalid, return "Unemployed".
 [language mandarin|chinese dialect experience]: x , #mandarin|chinese dialect
 [language mandarin|chinese dialect stars]: x , # if not found, return "null"
-[experience others experience]: x, #not-found
+[experience others experience]: x, # Return in the format '2 yr 6 mo' or '2 yr'. If not found, return "null".
