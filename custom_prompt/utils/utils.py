@@ -2,7 +2,7 @@
 def read_custom_prompt(file_path):    
     try:
         # Attempt to open the file for reading
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read().strip()  # Read content and remove trailing whitespace
             return content
     except FileNotFoundError:

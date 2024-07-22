@@ -16,7 +16,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from flask_cors import CORS
-from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_text, get_summary_from_text_gpt4o, get_summary_from_text_test )
+from openai_api.utils.utils import ( get_summary_from_image, get_summary_from_text, get_summary_from_text_gpt4o, get_summary_from_text_test, get_summary_from_text_gpt4omini, get_summary_from_image_gpt4omini)
 from anthropic_api.utils.utils import ( get_summary_from_image_using_claude )
 
 from custom_prompt.utils.utils import read_custom_prompt
@@ -34,7 +34,11 @@ USERNAME = "searchmaid"
 PASSWORD = "maidasia"
 
 # Global variable to store current OCR setting
-current_ocr = "claudeOCR"
+current_ocr = "gpt4ominiOCR"
+
+# Global variable to store structured text setting
+# current_structured_text = "gpt4omini"
+current_structured_text = "gpt4omini"
 
 # Define a decorator function to check if the user is authenticated
 def login_required(f):
@@ -166,8 +170,10 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             summary = extract_text_from_image(image_filename) ## extracted text from local tesseract OCR
         elif current_ocr == 'claudeOCR':
             summary = get_summary_from_image_using_claude(image_filename) ## summary text from claude Haiku OCR
+        elif current_ocr == 'gpt4ominiOCR':
+            summary = get_summary_from_image_gpt4omini(image_filename) ## summary text from gpt4omini OCR
         else:
-            summary = get_summary_from_image_using_claude(image_filename) ## summary text from claude Haiku OCR
+            summary = get_summary_from_image_gpt4omini(image_filename) ## summary text from gpt4omini OCR
 
         # summary = ""
         total_summary += summary + "\n"  # Add newline between summaries
@@ -197,22 +203,32 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         total_summary += custom_prompt + "\n"
 
-        # Count words in the input string
-        word_count = count_words(total_summary)
 
-        print(f"word count: {word_count}")
-        save_log(os.path.join(output_folder, "logs.txt"),f"word count: {word_count} , gpt3.5 words limit is 3000")
-        
-        # Check word count and print appropriate message
-        if word_count <= 2900:
-            print("Sending text to OpenAI  GPT3.5...")
-            save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT3.5...")
-            summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
-        else:
-            save_log(os.path.join(output_folder, "logs.txt"),"Words limit exceeds..switching to GPT4o")
-            save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT4o...")
-            summary_text = get_summary_from_text_gpt4o(total_summary) ## summary text from gpt4o
+        if current_structured_text == 'gpt35':
 
+            # Count words in the input string
+            word_count = count_words(total_summary)
+
+            print(f"word count: {word_count}")
+            save_log(os.path.join(output_folder, "logs.txt"),f"word count: {word_count} , gpt3.5 words limit is 3000")
+            
+            # Check word count and print appropriate message
+            if word_count <= 2900:
+                print("Sending text to OpenAI  GPT3.5...")
+                save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT3.5...")
+                summary_text = get_summary_from_text(total_summary) ## summary text from gpt3.5
+            else:
+                save_log(os.path.join(output_folder, "logs.txt"),"Words limit exceeds..switching to GPT4o")
+                save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT4o...")
+                summary_text = get_summary_from_text_gpt4o(total_summary) ## summary text from gpt4o
+        else:  ## gpt4omini
+
+            # Count words in the input string
+            word_count = count_words(total_summary)
+
+            print("Sending text to OpenAI  GPT4omini...")
+            save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT4omini...")
+            summary_text = get_summary_from_text_gpt4omini(total_summary) ## summary text from gpt4omini
 
         # Extracting values and updating summary_dict
         pattern = r'\[(.*?)\]:\s*(.*)'
@@ -229,9 +245,23 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         Is_incorrect_birth_date = "no"
         try:
+            
             birthdate_value = summary_dict.get("birth date", "")  # assuming format is 'DD/MM/YYYY'
             birthdate_value = birthdate_value.strip()
+            # # Remove unwanted characters 
+            # birthdate_pattern = r'[^0-9/]'  # Matches any character that is NOT a digit or "/"
+            # # Replace all characters not matching the pattern with whitespace
+            # birthdate_value = re.sub(birthdate_pattern, ' ', birthdate_value)
+
+            # Remove unwanted characters (keep only 0-9, '/', and ignore whitespace and ',')
+            pattern = r'[^\d/]'  # This pattern matches any character that is NOT a digit (0-9) or '/'
+
+            # Replace all characters not matching the pattern with an empty string
+            birthdate_value = re.sub(pattern, '', birthdate_value)
+
             maid_ref_code_value = summary_dict.get("maid ref code", "")
+
+            print(f"birth_date:  {birthdate_value}")
 
             # Check if birthdate_value is empty or incorrectly formatted
             if birthdate_value:
@@ -336,7 +366,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         #     maidrefcode_list.append(maid_ref_code_value)
         #     summary_dict["maid ref code"] = maid_ref_code_value
         # except Exception as e:
-        #     print(e)
+        #     print(f"Error occurred: {e}")
 
 
         try:
@@ -347,7 +377,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             else:
                 summary_dict["maid type option id"] = "New Maid"
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
         try:
             education_id_value = summary_dict.get("education id", "")
@@ -357,7 +387,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             else:
                 summary_dict["education id"] = "Others"
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
 
         try:
@@ -368,7 +398,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             else:
                 summary_dict["religion id"] = "Others"
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
 
         try:
@@ -379,7 +409,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             else:
                 summary_dict["marital status id"] = "Single"
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
         try:
             rest_day_value = summary_dict.get("rest day", "")
@@ -399,7 +429,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                 summary_dict["rest day"] = "1 rest days per month"
 
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
         try:
             maid_current_rest_day_id_value = summary_dict.get("maid current rest day id", "")
@@ -408,7 +438,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             else:
                 summary_dict["maid current rest day id"] = "1 rest days per month"
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
 
         try:
@@ -420,7 +450,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             else:
                 summary_dict["maid preferred rest day id"] = "1 rest days per month"
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
 
         try:
@@ -440,7 +470,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             else:
                 print("No maid employment history found in the input.")
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
 
         try:
@@ -461,7 +491,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                 print("No maid introduction found in the input.")
 
         except Exception as e:
-            print(e)
+            print(f"Error occurred: {e}")
 
         ##================================================================================##
 
@@ -490,7 +520,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         text_file.write(total_summary)
         text_file.write(f"\n[end]..{base_name}----------------------------------------------------------\n")
 
-    with open(os.path.join(output_folder, "summary_text_from_gpt35.txt"), "a", encoding="utf-8") as text_file:
+    with open(os.path.join(output_folder, "summary_text_from_gpt.txt"), "a", encoding="utf-8") as text_file:
         text_file.write(f"[start]{base_name}----------------------------------------------------------\n")
         text_file.write(str(summary_dict))
         text_file.write("\n")
@@ -809,8 +839,10 @@ def settings_page():
 def toggle_ocr_setting(setting):
     global current_ocr  # Access the global variable
     
-    if setting in ['gpt4o', 'tesseract', 'claude']:
+    if setting in ['gpt4omini','gpt4o', 'tesseract', 'claude']:
         # Set the current OCR setting based on the URL parameter
+        if setting == 'gpt4omini':
+            current_ocr = "gpt4ominiOCR"
         if setting == 'gpt4o':
             current_ocr = "gpt4oOCR"
         elif setting == 'tesseract':
@@ -832,10 +864,37 @@ def get_current_ocr():
     return jsonify({'current_ocr': current_ocr})
 
 
+# Endpoint to handle toggle Structured Text settings
+@app.route('/toggle-st/<setting>', methods=['POST'])
+@login_required
+def toggle_st_setting(setting):
+    global current_structured_text  # Access the global variable
+    
+    if setting in ['gpt4omini', 'gpt35']:
+        # Set the current Structured Text setting based on the URL parameter
+        if setting == 'gpt4omini':
+            current_structured_text = "gpt4omini"
+        elif setting == 'gpt35':
+            current_structured_text = "gpt35"
+        
+        # Print the current value of current_structured_text
+        print(f"Current Structured Text setting: {current_structured_text}")
+
+        return jsonify({'message': f'Successfully set {setting} Structured Text setting'}), 200
+    else:
+        return jsonify({'error': 'Invalid Structured Text setting'}), 400
+
+# Route to retrieve current structured text setting
+@app.route('/current-st', methods=['GET'])
+def get_current_st():
+    global current_structured_text
+    return jsonify({'current_structured_text': current_structured_text})
+
+
 @app.route('/download-gpt/<session_id>')
 def download_gpt(session_id):
-    # Replace with actual path to summary_text_from_gpt35.txt
-    filepath = 'output_pdf2images/summary_text_from_gpt35.txt'
+    # Replace with actual path to summary_text_from_gpt.txt
+    filepath = 'output_pdf2images/summary_text_from_gpt.txt'
     if os.path.exists(filepath):
         return send_file(filepath, as_attachment=True)
     else:
