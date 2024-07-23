@@ -43,9 +43,28 @@
             color: #333;
             margin-top: 10px;
         }
+
+        .logout-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #dc3545; /* Red background */
+            color: white; /* White text */
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+        }
+        .logout-button:hover {
+            background-color: #c82333; /* Darker red background on hover */
+        }
+        
     </style>
 </head>
 <body>
+    <a href="/logout" class="logout-button">Logout</a>
     <div class="container">
         <h1>Welcome!</h1>
         <button onclick="location.href='/home'" class="btn-start">Start</button>

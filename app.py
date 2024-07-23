@@ -661,7 +661,7 @@ def login():
         password = request.form.get('password')
         if username == USERNAME and password == PASSWORD:
             session['username'] = username
-            return redirect(url_for('home_page'))
+            return redirect(url_for('index'))
         else:
             return render_template('login/login.html', error='Invalid credentials')
     return render_template('login/login.html')
