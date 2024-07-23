@@ -72,6 +72,35 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload size
 progress = {}
 image_fullpath_with_face_list = []
 maidrefcode_list = []
+uploaded_pdf_file_list = []
+new_uploaded_pdf_file_path_list = []
+
+def copy_files_to_directory(file_paths, target_directory):
+    """
+    Copies files specified by file_paths to the target_directory.
+    
+    Args:
+    - file_paths (list): List of full file paths to be copied.
+    - target_directory (str): Directory where files will be copied.
+    
+    Returns:
+    - None
+    """
+    # Create the target directory if it doesn't exist
+    os.makedirs(target_directory, exist_ok=True)
+    
+    # Iterate through the list of file paths and copy each file to the target directory
+    for file_path in file_paths:
+        # Extract the filename from the full path
+        file_name = os.path.basename(file_path)
+        
+        # Construct the full target path
+        target_path = os.path.join(target_directory, file_name)
+        
+        # Copy the file to the target directory
+        shutil.copy(file_path, target_path)
+        print(f"Copied {file_path} to {target_path}")
+        new_uploaded_pdf_file_path_list.append(target_path)
 
 def count_words(input_string):
     # Split the input string by whitespace and count the number of elements
@@ -115,6 +144,35 @@ def rename_files(image_fullpath_with_face_list, maidrefcode_list):
     # Return the updated image_fullpath_with_face_list
     return image_fullpath_with_face_list
 
+def rename_files2(pdf_file_list, maidrefcode_list):
+    # Iterate through both lists simultaneously
+    for i in range(len(pdf_file_list)):
+        original_path = pdf_file_list[i]
+        maidrefcode = maidrefcode_list[i]
+
+        # Extract filename and extension
+        filename, extension = os.path.splitext(original_path)
+
+        # Check if maidrefcode is not empty
+        if maidrefcode:
+            # Form new filename with maidrefcode and original extension
+            new_filename = f"{maidrefcode}{extension}"
+
+            # Construct new full path
+            new_fullpath = os.path.join(os.path.dirname(original_path), new_filename)
+
+            try:
+                # Rename the file
+                os.rename(original_path, new_fullpath)
+
+                # Update pdf_file_list with new path
+                pdf_file_list[i] = new_fullpath
+
+            except OSError as e:
+                print(f"Error renaming {original_path} to {new_fullpath}: {e}")
+
+    # Return the updated pdf_file_list
+    return pdf_file_list
 
 ####### PDF to Images Extraction ################
 def pdf_to_jpg(pdf_file, output_folder, zoom=2):
@@ -158,7 +216,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         img.save(image_filename, "JPEG")
         page_images.append(image_filename)
         # print(f"Page {page_num + 1} of {pdf_file} saved as {image_filename}")
-        print(image_filename)
+        # print(image_filename)
 
         save_log(os.path.join(output_folder, "logs.txt"),f"Page {page_num + 1} of {pdf_file} extracted")
 
@@ -175,7 +233,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         else:
             summary = get_summary_from_image_gpt4omini(image_filename) ## summary text from gpt4omini OCR
 
-        # summary = ""
+        # summary = "test"
         total_summary += summary + "\n"  # Add newline between summaries
     
     # Close the PDF file
@@ -203,7 +261,6 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         total_summary += custom_prompt + "\n"
 
-
         if current_structured_text == 'gpt35':
 
             # Count words in the input string
@@ -229,6 +286,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             print("Sending text to OpenAI  GPT4omini...")
             save_log(os.path.join(output_folder, "logs.txt"),"Sending text to OpenAI GPT4omini...")
             summary_text = get_summary_from_text_gpt4omini(total_summary) ## summary text from gpt4omini
+
+        ## test
+        # summary_text = get_summary_from_text_test(total_summary)
 
         # Extracting values and updating summary_dict
         pattern = r'\[(.*?)\]:\s*(.*)'
@@ -342,8 +402,6 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
             maidrefcode_list.append(maid_ref_code_value)
             summary_dict["maid ref code"] = maid_ref_code_value
-
-        
 
         # try:
         #     # Getting the value corresponding to the key "maid ref code"" then stored
@@ -528,7 +586,6 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         text_file.write(f"\n[end]..{base_name}----------------------------------------------------------\n")
     
     # save_log(os.path.join(output_folder, "logs.txt"),"hello")
-
     return page_images
 
 ####### PDF to profile Picture Extraction #######
@@ -573,7 +630,6 @@ def extract_images_with_faces(pdf_path):
 
     return extracted_images
 
-
 # Load the pre-trained face detection classifier
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
@@ -590,8 +646,6 @@ def process_pdf_extract_image(filename):
     else:
         print(f"File '{filename}' not found or is not a PDF.")
         save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"File '{filename}' not found or is not a PDF.")
-     
-
 
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
@@ -610,7 +664,6 @@ def login():
 def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
-
 
 # Home route (secured)
 @app.route('/')
@@ -672,6 +725,7 @@ def upload_files():
         return jsonify({'error': 'No files selected for uploading'}), 400
     
     uploaded_files = []
+    uploaded_pdf_file_list = []
     session_id = str(os.urandom(16).hex())
     progress[session_id] = {'current': 0, 'total': len(files)}  # Initialize progress
 
@@ -681,7 +735,11 @@ def upload_files():
             fullpath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(fullpath)
             uploaded_files.append(filename)
+            uploaded_pdf_file_list.append(fullpath)
     
+    copy_files_to_directory(uploaded_pdf_file_list, EXTRACTED_PROFILE_PICTURE_FOLDER)
+    # print(uploaded_pdf_file_list)
+
     response = {
         'message': 'Files successfully uploaded',
         'files': uploaded_files,
@@ -714,6 +772,7 @@ def process_files(session_id):
         # print(image_fullpath_with_face_list)
         # print(maidrefcode_list)
         rename_files(image_fullpath_with_face_list, maidrefcode_list)
+        rename_files2(new_uploaded_pdf_file_path_list, maidrefcode_list)
         save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"Processed Completed. Ready to download!")
 
     if session_id not in progress:
@@ -760,7 +819,7 @@ def download_files(session_id):
     if session_id not in progress or progress[session_id]['current'] < progress[session_id]['total']:
         return jsonify({'error': 'Files are still being processed or invalid session ID'}), 400
 
-    zip_filename = f"profile_pictures_{session_id}.zip"
+    zip_filename = f"outputfiles_{session_id}.zip"
     zip_filepath = os.path.join(app.config['EXTRACTED_PROFILE_PICTURE_FOLDER'], zip_filename)
 
     with zipfile.ZipFile(zip_filepath, 'w') as zipf:
@@ -786,7 +845,6 @@ def download_csv(session_id):
     else:
         return jsonify({'error': 'output.csv not found'}), 404
 
-
 @app.route('/custom-prompt', methods=['GET', 'POST'])
 @login_required
 def text_editor():
@@ -803,7 +861,6 @@ def text_editor():
             default_content = f.read()
     
     return render_template('custom/custom-prompt-page.html', default_content=default_content)
-
 
 @app.route('/save-content', methods=['POST'])
 @login_required
@@ -824,14 +881,12 @@ def download_template():
     template_file = 'static/txt/custom_prompt_template.txt'
     return send_file(template_file, as_attachment=True)
 
-
 @app.route('/settings')
 @login_required  # Ensure only authenticated users can access settings
 def settings_page():
     if not check_authenticated():
         return redirect(url_for('login'))
     return render_template('settings/settings-page.html')
-
 
 # Endpoint to handle toggle OCR settings
 @app.route('/toggle-ocr/<setting>', methods=['POST'])
@@ -862,7 +917,6 @@ def toggle_ocr_setting(setting):
 def get_current_ocr():
     global current_ocr
     return jsonify({'current_ocr': current_ocr})
-
 
 # Endpoint to handle toggle Structured Text settings
 @app.route('/toggle-st/<setting>', methods=['POST'])
