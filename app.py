@@ -8,6 +8,7 @@ import zipfile
 import shutil
 import re
 import random
+from datetime import datetime
 
 # import os
 import io
@@ -28,6 +29,8 @@ from tesseract.utils.utils import extract_text_from_image
 app = Flask(__name__, template_folder='templates', static_folder='static', static_url_path='/static')
 CORS(app)
 app.secret_key = 'your_secret_key'  # Needed for session management
+
+last_upload_time = None
 
 # Hardcoded username and password (for demo purposes)
 USERNAME = "searchmaid"
@@ -176,7 +179,7 @@ def rename_files2(pdf_file_list, maidrefcode_list):
 
 ####### PDF to Images Extraction ################
 def pdf_to_jpg(pdf_file, output_folder, zoom=2):
-    global maidrefcode_list
+    global maidrefcode_list, last_upload_time
 
     # Get the base name of the PDF file to create a subfolder
     base_name = os.path.splitext(os.path.basename(pdf_file))[0]
@@ -201,6 +204,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     
     # Iterate through each page of the PDF
     for page_num in range(len(pdf_document)):
+        # Set the datetime
+        last_upload_time = datetime.now()
+
         # Get the page
         page = pdf_document.load_page(page_num)
         
@@ -667,6 +673,27 @@ def logout():
 
 # Home route (secured)
 @app.route('/')
+@login_required
+def index():
+    global last_upload_time
+    if last_upload_time:
+        current_time = datetime.now()
+        time_difference = current_time - last_upload_time
+        minutes_difference = int(time_difference.total_seconds() / 60)
+
+        if minutes_difference < 60:
+            time_label = f"{minutes_difference} minutes ago"
+        elif minutes_difference < 1440:
+            hours_difference = int(minutes_difference / 60)
+            time_label = f"{hours_difference} hour ago" if hours_difference == 1 else f"{hours_difference} hours ago"
+        else:
+            days_difference = int(minutes_difference / 1440)
+            time_label = f"{days_difference} day ago" if days_difference == 1 else f"{days_difference} days ago"
+    else:
+        time_label = "-"
+
+    return render_template('start/start-page.html', time_label=time_label)
+
 @app.route('/home')
 @login_required
 def home_page():
@@ -716,6 +743,8 @@ def home_page():
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_files():
+    global last_upload_time
+
     if not check_authenticated():
         return jsonify({'error': 'Unauthorized access'}), 401
     if 'files' not in request.files:
@@ -723,7 +752,9 @@ def upload_files():
     files = request.files.getlist('files')
     if not files:
         return jsonify({'error': 'No files selected for uploading'}), 400
-    
+
+    last_upload_time = datetime.now()
+
     uploaded_files = []
     uploaded_pdf_file_list = []
     session_id = str(os.urandom(16).hex())

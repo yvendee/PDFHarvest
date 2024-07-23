@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Page</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+        }
+        .btn-start {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-start:hover {
+            background-color: #45a049;
+        }
+        .last-run {
+            font-size: 14px;
+            color: #777;
+            margin-top: 6px;
+        }
+        .last-run-label {
+            font-weight: bold;
+        }
+        #time-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome!</h1>
+        <button onclick="location.href='/home'" class="btn-start">Start</button>
+        <br>
+        <br>
+        <div class="last-run">
+            <span class="last-run-label">Last Run:</span> <span id="time-label">{{ time_label }}</span>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript to update the time label dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch the time difference from Flask template variable
+            var timeLabel = "{{ time_label }}";
+            document.getElementById('time-label').textContent = timeLabel;
+        });
+    </script>
+</body>
+</html>

@@ -132,8 +132,17 @@
             cursor: pointer;
         }
     </style>
+
+    <script>
+        // JavaScript to store current time in localStorage
+        function storeUploadTime() {
+            var uploadTime = new Date().toISOString();
+            localStorage.setItem('lastUploadTime', uploadTime);
+        }
+    </script>
+    
 </head>
-<body>
+<body onload="storeUploadTime()">
 
 <button class="back-button hidden" id="backButton" onclick="goBack()">Back</button>
 
