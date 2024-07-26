@@ -311,81 +311,116 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         Is_incorrect_birth_date = "no"
         try:
-            
-            birthdate_value = summary_dict.get("birth date", "")  # assuming format is 'DD/MM/YYYY'
-            birthdate_value = birthdate_value.strip()
-            # # Remove unwanted characters 
-            # birthdate_pattern = r'[^0-9/]'  # Matches any character that is NOT a digit or "/"
-            # # Replace all characters not matching the pattern with whitespace
-            # birthdate_value = re.sub(birthdate_pattern, ' ', birthdate_value)
 
-            # Remove unwanted characters (keep only 0-9, '/', and ignore whitespace and ',')
-            pattern = r'[^\d/]'  # This pattern matches any character that is NOT a digit (0-9) or '/'
-
-            # Replace all characters not matching the pattern with an empty string
-            birthdate_value = re.sub(pattern, '', birthdate_value)
-
+            # Get the maid ref code and birth date value from the dictionary
             maid_ref_code_value = summary_dict.get("maid ref code", "")
+            birth_date_value = summary_dict.get("birth date", "")
 
-            print(f"birth_date:  {birthdate_value}")
+            # List of unwanted values
+            unwanted = [
+                "not provided", "n/a", "n.a", "null", "not found", "not-found",
+                "not specified", "not applicable", "none", "not mentioned",
+                "not-mentioned", "not evaluated"
+            ]
 
-            # Check if birthdate_value is empty or incorrectly formatted
-            if birthdate_value:
-                if len(birthdate_value) != 10 or birthdate_value[2] != '/' or birthdate_value[5] != '/':
-                    print("incorrect birth date format")
-                    formatted_birthdate = ""
-                    Is_incorrect_birth_date = "yes"
-                else:
-                    try:
-                        day, month, year = birthdate_value.split('/')
-                        
-                        # Format the maid ref "YYMMDD"
-                        formatted_birthdate = f"{year[-2:]}{month.zfill(2)}{day.zfill(2)}"
+            # Single maid_ref_code_value to check
+            maid_ref_code_value_cleaned = maid_ref_code_value.strip().lower()
 
-                    except ValueError:
+            if maid_ref_code_value_cleaned in unwanted:
+
+                # Get the maid name value or an empty string if the key is not present
+                maid_name_value = summary_dict.get("maid name", "")
+
+                # Get the first two letters, convert them to uppercase, and handle cases where the name might be shorter
+                first_two_letters = maid_name_value[:2].upper()
+
+                # print(first_two_letters)
+
+                birthdate_value = summary_dict.get("birth date", "")  # assuming format is 'DD/MM/YYYY'
+                birthdate_value = birthdate_value.strip()
+                # # Remove unwanted characters 
+                # birthdate_pattern = r'[^0-9/]'  # Matches any character that is NOT a digit or "/"
+                # # Replace all characters not matching the pattern with whitespace
+                # birthdate_value = re.sub(birthdate_pattern, ' ', birthdate_value)
+
+                # Remove unwanted characters (keep only 0-9, '/', and ignore whitespace and ',')
+                pattern = r'[^\d/]'  # This pattern matches any character that is NOT a digit (0-9) or '/'
+
+                # Replace all characters not matching the pattern with an empty string
+                birthdate_value = re.sub(pattern, '', birthdate_value)
+
+                # print(f"birth_date:  {birthdate_value}")
+
+                # Check if birthdate_value is empty or incorrectly formatted
+                formatted_birthdate = ""
+                if birthdate_value:
+                    if len(birthdate_value) != 10 or birthdate_value[2] != '/' or birthdate_value[5] != '/':
                         print("incorrect birth date format")
                         formatted_birthdate = ""
                         Is_incorrect_birth_date = "yes"
+                    else:
+                        try:
+                            day, month, year = birthdate_value.split('/')
+                            
+                            # Format the maid ref "YYMMDD"
+                            formatted_birthdate = f"{year[-2:]}{month.zfill(2)}{day.zfill(2)}"
+                            print("correct birth date format")
+
+                        except ValueError:
+                            print("incorrect birth date format")
+                            formatted_birthdate = ""
+                            Is_incorrect_birth_date = "yes"
+                else:
+                    print("incorrect birth date format")
+                    formatted_birthdate = ""
+                    Is_incorrect_birth_date = "yes"
+
+                # Append formatted_birthdate to first_two_letters
+                maid_ref_code_value = first_two_letters + formatted_birthdate
+
+                if(Is_incorrect_birth_date == "no"):
+                    # Remove unwanted characters 
+                    pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
+            
+                    # Replace all characters not matching the pattern with whitespace
+                    maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+
+                    # Remove all whitespace from the cleaned string
+                    maid_ref_code_value = ''.join(maid_ref_code_value.split())
+
+                    maidrefcode_list.append(maid_ref_code_value)
+                    summary_dict["maid ref code"] = maid_ref_code_value
+
+                else:
+                    # Generate a 6-digit random number
+                    random_number = random.randint(100000, 999999)
+
+                    # Append the random number to maid_ref_code_value
+                    maid_ref_code_value = first_two_letters + str(random_number)
+                    ## append to maidrefcode_list for renaming of extracted inage with  face
+
+                    # Remove unwanted characters 
+                    pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
+            
+                    # Replace all characters not matching the pattern with whitespace
+                    maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+                    
+                    # Remove all whitespace from the cleaned string
+                    maid_ref_code_value = ''.join(maid_ref_code_value.split())
+
+                    maidrefcode_list.append(maid_ref_code_value)
+                    summary_dict["maid ref code"] = maid_ref_code_value
+                    
             else:
-                print("incorrect birth date format")
-                formatted_birthdate = ""
-                Is_incorrect_birth_date = "yes"
 
-            # Append formatted_birthdate to maid_ref_code_value
-            maid_ref_code_value += formatted_birthdate
+                # Format the birth date by removing slashes
+                formatted_birth_date = birth_date_value.replace("/", "")
 
-            if(Is_incorrect_birth_date == "no"):
-                # Remove unwanted characters 
-                pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
-        
-                # Replace all characters not matching the pattern with whitespace
-                maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+                # Concatenate the maid ref code and the formatted birth date
+                result = maid_ref_value + formatted_birth_date
 
-                # Remove all whitespace from the cleaned string
-                maid_ref_code_value = ''.join(maid_ref_code_value.split())
-
-                maidrefcode_list.append(maid_ref_code_value)
-                summary_dict["maid ref code"] = maid_ref_code_value
-
-            else:
-                # Generate a 6-digit random number
-                random_number = random.randint(100000, 999999)
-
-                # Append the random number to maid_ref_code_value
-                maid_ref_code_value += str(random_number)
-                ## append to maidrefcode_list for renaming of extracted inage with  face
-
-                # Remove unwanted characters 
-                pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
-        
-                # Replace all characters not matching the pattern with whitespace
-                maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
-                
-                # Remove all whitespace from the cleaned string
-                maid_ref_code_value = ''.join(maid_ref_code_value.split())
-
-                maidrefcode_list.append(maid_ref_code_value)
-                summary_dict["maid ref code"] = maid_ref_code_value
+                # print(result)  # Output should be "JS1234071699"
+                summary_dict["maid ref code"] = result
 
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -465,15 +500,15 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             print(f"Error occurred: {e}")
 
 
-        try:
-            # Getting the value corresponding to the key "marital status id"" then stored
-            marital_status_id_value = summary_dict.get("marital status id", "")
-            if marital_status_id_value.strip().lower() in ["single", "married" ,"divorced"]:
-                summary_dict["marital status id"] = marital_status_id_value.strip().lower()
-            else:
-                summary_dict["marital status id"] = "Single"
-        except Exception as e:
-            print(f"Error occurred: {e}")
+        # try:
+        #     # Getting the value corresponding to the key "marital status id"" then stored
+        #     marital_status_id_value = summary_dict.get("marital status id", "")
+        #     if marital_status_id_value.strip().lower() in ["single", "married" ,"divorced"]:
+        #         summary_dict["marital status id"] = marital_status_id_value.strip().lower()
+        #     else:
+        #         summary_dict["marital status id"] = "Single"
+        # except Exception as e:
+        #     print(f"Error occurred: {e}")
 
         try:
             rest_day_value = summary_dict.get("rest day", "")
