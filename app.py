@@ -1,6 +1,7 @@
 from functools import wraps
 from flask import Flask, request, Blueprint, render_template, jsonify, session, redirect, url_for, send_file
 
+import sys
 import os
 import time
 from threading import Thread
@@ -117,37 +118,43 @@ def uppercase_the_first_letter(item):
     processed_words = [word.lower().capitalize() for word in words]
     return ' '.join(processed_words)
 
-def rename_files(image_fullpath_with_face_list, maidrefcode_list):
+def rename_files(image_fullpath_with_face_list, maidrefcode_list): ## rename extracted images with maid ref code
     # Iterate through both lists simultaneously
     for i in range(len(image_fullpath_with_face_list)):
-        original_path = image_fullpath_with_face_list[i]
-        maidrefcode = maidrefcode_list[i]
 
-        # Extract filename and extension
-        filename, extension = os.path.splitext(original_path)
+        if(image_fullpath_with_face_list[i] == "no-picture-found"):
+            print("no picture found!")
+        else:
+            print("with picture found!")
+        
+            original_path = image_fullpath_with_face_list[i]
+            maidrefcode = maidrefcode_list[i]
 
-        # Check if maidrefcode is not empty
-        if maidrefcode:
-            # Form new filename with maidrefcode and original extension
-            new_filename = f"{maidrefcode}{extension}"
+            # Extract filename and extension
+            filename, extension = os.path.splitext(original_path)
 
-            # Construct new full path
-            new_fullpath = os.path.join(os.path.dirname(original_path), new_filename)
+            # Check if maidrefcode is not empty
+            if maidrefcode:
+                # Form new filename with maidrefcode and original extension
+                new_filename = f"{maidrefcode}{extension}"
 
-            try:
-                # Rename the file
-                os.rename(original_path, new_fullpath)
+                # Construct new full path
+                new_fullpath = os.path.join(os.path.dirname(original_path), new_filename)
 
-                # Update image_fullpath_with_face_list with new path
-                image_fullpath_with_face_list[i] = new_fullpath
+                try:
+                    # Rename the file
+                    os.rename(original_path, new_fullpath)
 
-            except OSError as e:
-                print(f"Error renaming {original_path} to {new_fullpath}: {e}")
+                    # Update image_fullpath_with_face_list with new path
+                    image_fullpath_with_face_list[i] = new_fullpath
+
+                except OSError as e:
+                    print(f"Error renaming {original_path} to {new_fullpath}: {e}")
 
     # Return the updated image_fullpath_with_face_list
     return image_fullpath_with_face_list
 
-def rename_files2(pdf_file_list, maidrefcode_list):
+def rename_files2(pdf_file_list, maidrefcode_list):  ## rename input pdf's with maid ref code
     # Iterate through both lists simultaneously
     for i in range(len(pdf_file_list)):
         original_path = pdf_file_list[i]
@@ -310,6 +317,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
         ##=========== Special Case Here For Initial Setting of Key Values ================##
 
         Is_incorrect_birth_date = "no"
+
         try:
 
             # Get the maid ref code and birth date value from the dictionary
@@ -417,10 +425,14 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                 formatted_birth_date = birth_date_value.replace("/", "")
 
                 # Concatenate the maid ref code and the formatted birth date
-                result = maid_ref_value + formatted_birth_date
+                # result = maid_ref_code_value + formatted_birth_date
+                result = maid_ref_code_value
+
+                result = result.replace("-","")
 
                 # print(result)  # Output should be "JS1234071699"
                 summary_dict["maid ref code"] = result
+                maidrefcode_list.append(result)
 
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -629,7 +641,26 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
     # save_log(os.path.join(output_folder, "logs.txt"),"hello")
     return page_images
 
+
 ####### PDF to profile Picture Extraction #######
+
+# Function to resize an image proportionately if either dimension is above 250 px
+def resize_image_if_needed(image_pil):
+    width, height = image_pil.size
+
+    if width > 250 or height > 250:
+        if width > height:
+            scaling_factor = 250 / width
+        else:
+            scaling_factor = 250 / height
+
+        new_width = int(width * scaling_factor)
+        new_height = int(height * scaling_factor)
+
+        # Resize image
+        return image_pil.resize((new_width, new_height), Image.LANCZOS)
+    return image_pil
+
 # Function to extract images with faces from a specific PDF file
 def extract_images_with_faces(pdf_path):
     global image_fullpath_with_face_list
@@ -659,6 +690,10 @@ def extract_images_with_faces(pdf_path):
         if len(faces) > 0 and not face_found:
             # If a face is detected and no face has been found yet on the first page
             face_found = True
+
+            # Resize the image if needed
+            image_pil = resize_image_if_needed(image_pil)
+
             # Save the image in the main folder with the PDF base name as the image name
             image_filename = f"{pdf_basename}_{image_index + 1}.jpg"  # Naming based on image index
             image_fullpath = os.path.join(main_folder, image_filename)
@@ -666,9 +701,11 @@ def extract_images_with_faces(pdf_path):
             extracted_images.append(image_pil)
             image_fullpath_with_face_list.append(image_fullpath)
             break  # Stop processing further images on the first page once a face is found
+        else:
+            image_fullpath_with_face_list.append("no-picture-found")
+            break
 
     pdf_document.close()
-
     return extracted_images
 
 # Load the pre-trained face detection classifier
@@ -778,7 +815,7 @@ def home_page():
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_files():
-    global last_upload_time
+    global last_upload_time, uploaded_pdf_file_list
 
     if not check_authenticated():
         return jsonify({'error': 'Unauthorized access'}), 401
@@ -804,7 +841,7 @@ def upload_files():
             uploaded_pdf_file_list.append(fullpath)
     
     copy_files_to_directory(uploaded_pdf_file_list, EXTRACTED_PROFILE_PICTURE_FOLDER)
-    # print(uploaded_pdf_file_list)
+    print(uploaded_pdf_file_list)
 
     response = {
         'message': 'Files successfully uploaded',
@@ -817,29 +854,42 @@ def upload_files():
 @app.route('/process/<session_id>', methods=['POST'])
 @login_required
 def process_files(session_id):
-    global image_fullpath_with_face_list, maidrefcode_list
+    global image_fullpath_with_face_list, maidrefcode_list, uploaded_pdf_file_list
 
     if not check_authenticated():
         return jsonify({'error': 'Unauthorized access'}), 401
     def mock_processing():
         uploaded_files = os.listdir(UPLOAD_FOLDER)
+        # print(uploaded_files)
         total_files = len(uploaded_files)
         progress[session_id]['total'] = total_files
+        print(f"total files in the uploads is {total_files}")
 
-        for index, filename in enumerate(uploaded_files):
+        # for index, filename in enumerate(uploaded_files):
+        index = 0
+        for i in range (len(uploaded_pdf_file_list)):
+            pdf_file_path = uploaded_pdf_file_list[i]
+            filename = os.path.basename(pdf_file_path)
             # Simulate processing of each file
-            time.sleep(3)  # Simulate processing delay
+            # time.sleep(3)  # Simulate processing delay
             process_pdf_extract_image(filename)
             pdf_path = os.path.join(UPLOAD_FOLDER, filename)
             pdf_to_jpg(pdf_path, EXTRACTED_PAGE_IMAGES_FOLDER, zoom=2)
-            progress[session_id]['current'] = index + 1
+            index += 1
+            progress[session_id]['current'] = index
+            
+        try:
+            # print(image_fullpath_with_face_list)
+            # print(maidrefcode_list)
+            # maidrefcode_list = ['SRANML240075','CML','AA']
+            # print(image_fullpath_with_face_list)
+            rename_files(image_fullpath_with_face_list, maidrefcode_list)
+            rename_files2(new_uploaded_pdf_file_path_list, maidrefcode_list)
+            save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"Processed Completed. Ready to download!")
+        except Exception as e:
+            print(f"An error occured: {e}")
+            save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"An error occured: {e}")
 
-        
-        # print(image_fullpath_with_face_list)
-        # print(maidrefcode_list)
-        rename_files(image_fullpath_with_face_list, maidrefcode_list)
-        rename_files2(new_uploaded_pdf_file_path_list, maidrefcode_list)
-        save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"Processed Completed. Ready to download!")
 
     if session_id not in progress:
         return jsonify({'error': 'Invalid session ID'}), 400
@@ -1039,7 +1089,7 @@ def fetch_logs(session_id):
         return logs_content
     except Exception as e:
         # return str(e), 500  # Return error message and HTTP status code 500 for server error
-        return "Waiting for the log.txt to be available", 500  # Return error message and HTTP status code 500 for server error
+        return "Waiting for the log file to be available", 500  # Return error message and HTTP status code 500 for server error
 
 
 @app.route('/save-csv')

@@ -18,81 +18,81 @@ def save_csv(filename, header, data):
     # Modify specific header value if found
     for i in range(len(header)):
         if header[i] == 'language_english_experience':
-            header[i] = 'Language-English-Experience'
+            header[i] = 'Language–English–Experience'
         if header[i] == 'language_english_stars':
-            header[i] = 'Language-English-stars'
+            header[i] = 'Language–English–stars'
         if header[i] == 'expertise_care_for_infant|children_experience__willing':
-            header[i] = 'Expertise-Care for Infant/Children-Experience - Willing?'
+            header[i] = 'Expertise–Care for Infant/Children–Experience – Willing?'
         if header[i] == 'expertise_care_for_infant|children_experience_willing':
-            header[i] = 'Expertise-Care for Infant/Children-Experience - Willing?'
+            header[i] = 'Expertise–Care for Infant/Children–Experience – Willing?'
         if header[i] == 'expertise_care_for_infant|children_experience':
-            header[i] = 'Expertise-Care for Infant/Children-Experience'
+            header[i] = 'Expertise–Care for Infant/Children–Experience'
 
         if header[i] == 'expertise_care_for_infant|children_stars':
-            header[i] = 'Expertise-Care for Infant/Children-stars'
+            header[i] = 'Expertise–Care for Infant/Children–stars'
         if header[i] == 'expertise_care_for_elderly_experience__willing':
-            header[i] = 'Expertise-Care for Elderly-Experience - Willing?'
+            header[i] = 'Expertise–Care for Elderly–Experience – Willing?'
 
         if header[i] == 'expertise_care_for_elderly_experience':
-            header[i] = 'Expertise-Care for Elderly-Experience'
+            header[i] = 'Expertise–Care for Elderly–Experience'
 
         if header[i] == 'expertise_care_for_elderly_stars':
-            header[i] = 'Expertise-Care for Elderly-stars'
+            header[i] = 'Expertise–Care for Elderly–stars'
         if header[i] == 'expertise_care_for_disabled_experience__willing':
-            header[i] = 'Expertise-Care for Disabled-Experience - Willing?'
+            header[i] = 'Expertise–Care for Disabled–Experience – Willing?'
         if header[i] == 'expertise_care_for_disabled_experience_willing':
-            header[i] = 'Expertise-Care for Disabled-Experience - Willing?'
+            header[i] = 'Expertise–Care for Disabled–Experience – Willing?'
         
         if header[i] == 'expertise_care_for_disabled_experience':
-            header[i] = 'Expertise-Care for Disabled-Experience'
+            header[i] = 'Expertise–Care for Disabled–Experience'
         if header[i] == 'expertise_care_for_disabled_stars':
-            header[i] = 'Expertise-Care for Disabled-stars'
+            header[i] = 'Expertise–Care for Disabled–stars'
         if header[i] == 'expertise_general_housework_experience__willing':
-            header[i] = 'Expertise-General Housework-Experience - Willing?'
+            header[i] = 'Expertise–General Housework–Experience – Willing?'
         if header[i] == 'expertise_general_housework_experience_willing':
-            header[i] = 'Expertise-General Housework-Experience - Willing?'
+            header[i] = 'Expertise–General Housework–Experience – Willing?'
         if header[i] == 'expertise_general_housework_experience_willing':
-            header[i] = 'Expertise-General Housework-Experience - Willing?'
+            header[i] = 'Expertise–General Housework–Experience – Willing?'
 
         if header[i] == 'expertise_general_housework_experience':
-            header[i] = 'Expertise-General Housework-Experience'
+            header[i] = 'Expertise–General Housework–Experience'
         if header[i] == 'expertise_general_housework_stars':
-            header[i] = 'Expertise-General Housework-stars'
+            header[i] = 'Expertise–General Housework–stars'
         if header[i] == 'expertise_cooking_experience__willing':
-            header[i] = 'Expertise-Cooking-Experience - Willing?'
+            header[i] = 'Expertise–Cooking–Experience – Willing?'
         if header[i] == 'expertise_cooking_experience_willing':
-            header[i] = 'Expertise-Cooking-Experience - Willing?'
+            header[i] = 'Expertise–Cooking–Experience – Willing?'
 
         if header[i] == 'expertise_cooking_experience':
-            header[i] = 'Expertise-Cooking-Experience'
+            header[i] = 'Expertise–Cooking–Experience'
         if header[i] == 'expertise_cooking_stars':
-            header[i] = 'Expertise-Cooking-stars'
+            header[i] = 'Expertise–Cooking–stars'
 
         if header[i] == 'additional_info_able_to_handle_pork':
-            header[i] = 'AdditionalInfo-Able to handle pork?'
+            header[i] = 'AdditionalInfo–Able to handle pork?'
         if header[i] == 'additional_info_able_to_eat_pork':
-            header[i] = 'AdditionalInfo-Able to eat pork?'
+            header[i] = 'AdditionalInfo–Able to eat pork?'
         if header[i] == 'additional_info_able_to_handle_beef':
-            header[i] = 'AdditionalInfo-Able to handle beef?'
+            header[i] = 'AdditionalInfo–Able to handle beef?'
         if header[i] == 'additional_info_able_to_care_dog|cat':
-            header[i] = 'AdditionalInfo-Able to care dog/cat?'
+            header[i] = 'AdditionalInfo–Able to care dog/cat?'
 
         if header[i] == 'additional_info_able_to_do_gardening_work':
-            header[i] = 'AdditionalInfo-Able to do gardening work?'
+            header[i] = 'AdditionalInfo–Able to do gardening work?'
 
         if header[i] == 'additional_info_able_to_do_simple_sewing':
-            header[i] = 'AdditionalInfo-Able to do simple sewing?'
+            header[i] = 'AdditionalInfo–Able to do simple sewing?'
         if header[i] == 'additional_info_willing_to_wash_car':
-            header[i] = 'AdditionalInfo-Willing to wash car?'
+            header[i] = 'AdditionalInfo–Willing to wash car?'
         if header[i] == 'experience_singaporean_experience':
-            header[i] = 'Experience-Singaporean-Experience'
+            header[i] = 'Experience–Singaporean–Experience'
 
         if header[i] == 'language_mandarin|chinese_dialect_experience':
-            header[i] = 'Language-Mandarin/Chinese-Dialect-Experience'
+            header[i] = 'Language–Mandarin/Chinese–Dialect–Experience'
         if header[i] == 'language_mandarin|chinese_dialect_stars':
-            header[i] = 'Language-Mandarin/Chinese-Dialect-stars'
+            header[i] = 'Language–Mandarin/Chinese–Dialect–stars'
         if header[i] == 'experience_others_experience':
-            header[i] = 'Experience-Others-Experience'
+            header[i] = 'Experience–Others–Experience'
 
     # Check if the file exists
     file_exists = os.path.exists(filename)
