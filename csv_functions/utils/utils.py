@@ -1,5 +1,6 @@
 import os
 import re
+import codecs
 
 # Define accepted characters as a regular expression pattern
 accepted_chars_pattern = r'[ &_$a-zA-Z0-9\(\)\-\~\/\\\<\>=\.\@:;+|]'
@@ -146,13 +147,22 @@ def save_csv(filename, header, data):
     except Exception as e:
         print(e)
 
-    with open(filename, 'a', newline='', encoding='utf-8') as csvfile:
-        # If the file doesn't exist, write the header
+    ## simple csv generation
+    # with open(filename, 'a', newline='', encoding='utf-8') as csvfile:
+    #     # If the file doesn't exist, write the header
+    #     if not file_exists:
+    #         csvfile.write('"' + '","'.join(header) + '"\n')
+
+    #     # Write the data
+    #     csvfile.write('"' + '","'.join(processed_data2) + '"\n')
+
+
+    ## csv generation for microsoft excel
+    ## Write data to CSV file with UTF-8 BOM
+    with codecs.open(filename, 'a', 'utf-8-sig') as csvfile:
         if not file_exists:
             csvfile.write('"' + '","'.join(header) + '"\n')
-
-        # Write the data
-        csvfile.write('"' + '","'.join(processed_data2) + '"\n')
+        csvfile.write('"' + '","'.join(processed_data) + '"\n')
 
 # # # Example usage:
 # filename = 'example.csv'
