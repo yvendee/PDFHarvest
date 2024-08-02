@@ -863,7 +863,7 @@ def upload_files():
 @app.route('/process/<session_id>', methods=['POST'])
 @login_required
 def process_files(session_id):
-    global image_fullpath_with_face_list, maidrefcode_list, uploaded_pdf_file_list
+    global image_fullpath_with_face_list, maidrefcode_list, uploaded_pdf_file_list, new_uploaded_pdf_file_path_list
 
     if not check_authenticated():
         return jsonify({'error': 'Unauthorized access'}), 401
@@ -889,10 +889,10 @@ def process_files(session_id):
             
         try:
             # maidrefcode_list = ['SRANML240075','CML','AA']
-            # print(maidrefcode_list)
-            # print(image_fullpath_with_face_list)
-            # print(new_uploaded_pdf_file_path_list)
-            
+            print(maidrefcode_list)
+            print(image_fullpath_with_face_list)
+            print(new_uploaded_pdf_file_path_list)
+
             rename_files(image_fullpath_with_face_list, maidrefcode_list)
             rename_files2(new_uploaded_pdf_file_path_list, maidrefcode_list)
             save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"Processed Completed. Ready to download!")
