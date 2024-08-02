@@ -162,7 +162,7 @@ def save_csv(filename, header, data):
     with codecs.open(filename, 'a', 'utf-8-sig') as csvfile:
         if not file_exists:
             csvfile.write('"' + '","'.join(header) + '"\n')
-        csvfile.write('"' + '","'.join(processed_data) + '"\n')
+        csvfile.write('"' + '","'.join(processed_data2) + '"\n')
 
 # # # Example usage:
 # filename = 'example.csv'
