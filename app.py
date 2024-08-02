@@ -331,10 +331,14 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                 "not-mentioned", "not evaluated"
             ]
 
+            # Define the pattern to check for both alphabets and numbers
+            pattern = r'(?=.*[A-Za-z])(?=.*\d)'
+
             # Single maid_ref_code_value to check
             maid_ref_code_value_cleaned = maid_ref_code_value.strip().lower()
 
-            if maid_ref_code_value_cleaned in unwanted:
+            # if maid_ref_code_value_cleaned in unwanted:
+            if maid_ref_code_value_cleaned in unwanted or not re.search(pattern, maid_ref_code_value_cleaned):
 
                 # Get the maid name value or an empty string if the key is not present
                 maid_name_value = summary_dict.get("maid name", "")
@@ -674,36 +678,40 @@ def extract_images_with_faces(pdf_path):
     extracted_images = []
 
     pdf_document = fitz.open(pdf_path)
+    try:
+        # Extract images from the first page only
+        page_number = 0
+        page = pdf_document[page_number]
+        image_list = page.get_images(full=True)
+        face_found = False  # Flag to track if a face has been found on the first page
+        for image_index, img in enumerate(image_list):
+            xref = img[0]
+            base_image = pdf_document.extract_image(xref)
+            image_bytes = base_image["image"]
+            image_pil = Image.open(io.BytesIO(image_bytes))
+            image_cv2 = cv2.cvtColor(cv2.cvtColor(np.array(image_pil), cv2.COLOR_RGB2BGR), cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(image_cv2, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+            print(f"number of face detected: {len(faces)}")
+            if len(faces) > 0 and not face_found:
+                # If a face is detected and no face has been found yet on the first page
+                face_found = True
 
-    # Extract images from the first page only
-    page_number = 0
-    page = pdf_document[page_number]
-    image_list = page.get_images(full=True)
-    face_found = False  # Flag to track if a face has been found on the first page
-    for image_index, img in enumerate(image_list):
-        xref = img[0]
-        base_image = pdf_document.extract_image(xref)
-        image_bytes = base_image["image"]
-        image_pil = Image.open(io.BytesIO(image_bytes))
-        image_cv2 = cv2.cvtColor(cv2.cvtColor(np.array(image_pil), cv2.COLOR_RGB2BGR), cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(image_cv2, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-        if len(faces) > 0 and not face_found:
-            # If a face is detected and no face has been found yet on the first page
-            face_found = True
+                # Resize the image if needed
+                image_pil = resize_image_if_needed(image_pil)
 
-            # Resize the image if needed
-            image_pil = resize_image_if_needed(image_pil)
+                # Save the image in the main folder with the PDF base name as the image name
+                image_filename = f"{pdf_basename}_{image_index + 1}.jpg"  # Naming based on image index
+                image_fullpath = os.path.join(main_folder, image_filename)
+                image_pil.save(image_fullpath, "JPEG")
+                extracted_images.append(image_pil)
+                image_fullpath_with_face_list.append(image_fullpath)
+                break  # Stop processing further images on the first page once a face is found
 
-            # Save the image in the main folder with the PDF base name as the image name
-            image_filename = f"{pdf_basename}_{image_index + 1}.jpg"  # Naming based on image index
-            image_fullpath = os.path.join(main_folder, image_filename)
-            image_pil.save(image_fullpath, "JPEG")
-            extracted_images.append(image_pil)
-            image_fullpath_with_face_list.append(image_fullpath)
-            break  # Stop processing further images on the first page once a face is found
-        else:
+        if face_found == False:
             image_fullpath_with_face_list.append("no-picture-found")
-            break
+
+    except Exception as e:
+        print (f"Error has occurred during face detection {e}")
 
     pdf_document.close()
     return extracted_images
@@ -769,10 +777,11 @@ def index():
 @app.route('/home')
 @login_required
 def home_page():
-    global image_fullpath_with_face_list, maidrefcode_list
+    global image_fullpath_with_face_list, maidrefcode_list, new_uploaded_pdf_file_path_list
 
     image_fullpath_with_face_list = []
     maidrefcode_list = []
+    new_uploaded_pdf_file_path_list = []
 
     if not check_authenticated():
         return redirect(url_for('login'))
@@ -874,15 +883,16 @@ def process_files(session_id):
             # time.sleep(3)  # Simulate processing delay
             process_pdf_extract_image(filename)
             pdf_path = os.path.join(UPLOAD_FOLDER, filename)
-            pdf_to_jpg(pdf_path, EXTRACTED_PAGE_IMAGES_FOLDER, zoom=2)
+            pdf_to_jpg(pdf_path, EXTRACTED_PAGE_IMAGES_FOLDER, zoom=2) ## ocr and analyzing
             index += 1
             progress[session_id]['current'] = index
             
         try:
-            # print(image_fullpath_with_face_list)
-            # print(maidrefcode_list)
             # maidrefcode_list = ['SRANML240075','CML','AA']
+            # print(maidrefcode_list)
             # print(image_fullpath_with_face_list)
+            # print(new_uploaded_pdf_file_path_list)
+            
             rename_files(image_fullpath_with_face_list, maidrefcode_list)
             rename_files2(new_uploaded_pdf_file_path_list, maidrefcode_list)
             save_log(os.path.join(EXTRACTED_PAGE_IMAGES_FOLDER, "logs.txt"),f"Processed Completed. Ready to download!")
