@@ -318,6 +318,20 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
         ##=========== Special Case Here For Initial Setting of Key Values ================##
 
+
+        try:
+            maid_name_value = summary_dict.get("maid name", "")
+
+            # Define a regular expression pattern to match unwanted characters
+            pattern = re.compile(r'[^a-zA-Z ]')
+
+            # Replace unwanted characters with an empty string
+            maid_name_value_cleaned = re.sub(pattern, '', maid_name_value)
+            summary_dict["maid name"] = maid_name_value_cleaned
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
         Is_incorrect_birth_date = "no"
 
         try:
