@@ -416,6 +416,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                     # Remove all whitespace from the cleaned string
                     maid_ref_code_value = ''.join(maid_ref_code_value.split())
 
+                    # Remove unnecessary leading and trailing spaces
+                    maid_ref_code_value = maid_ref_code_value.strip()
+
                     maidrefcode_list.append(maid_ref_code_value)
                     summary_dict["maid ref code"] = maid_ref_code_value
 
@@ -436,6 +439,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                     # Remove all whitespace from the cleaned string
                     maid_ref_code_value = ''.join(maid_ref_code_value.split())
 
+                    # Remove unnecessary leading and trailing spaces
+                    maid_ref_code_value = maid_ref_code_value.strip()
+
                     maidrefcode_list.append(maid_ref_code_value)
                     summary_dict["maid ref code"] = maid_ref_code_value
                     
@@ -455,6 +461,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                 result = maid_ref_code_value
 
                 result = result.replace("-","")
+
+                # Remove unnecessary leading and trailing spaces
+                result = result.strip()
 
                 # print(result)  # Output should be "JS1234071699"
                 summary_dict["maid ref code"] = result
@@ -478,6 +487,9 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
             
             # Remove all whitespace from the cleaned string
             maid_ref_code_value = ''.join(maid_ref_code_value.split())
+
+            # Remove unnecessary leading and trailing spaces
+            maid_ref_code_value = maid_ref_code_value.strip()
 
             maidrefcode_list.append(maid_ref_code_value)
             summary_dict["maid ref code"] = maid_ref_code_value
