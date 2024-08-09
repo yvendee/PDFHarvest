@@ -327,6 +327,8 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
             # Replace unwanted characters with an empty string
             maid_name_value_cleaned = re.sub(pattern, '', maid_name_value)
+            maid_name_value_cleaned = maid_name_value_cleaned.replace('"',"")
+            maid_name_value_cleaned = maid_name_value_cleaned.strip()
             summary_dict["maid name"] = maid_name_value_cleaned
 
         except Exception as e:
@@ -411,13 +413,15 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                     pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
             
                     # Replace all characters not matching the pattern with whitespace
-                    maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+                    maid_ref_code_value = re.sub(pattern, '', maid_ref_code_value)
 
                     # Remove all whitespace from the cleaned string
                     maid_ref_code_value = ''.join(maid_ref_code_value.split())
 
                     # Remove unnecessary leading and trailing spaces
                     maid_ref_code_value = maid_ref_code_value.strip()
+
+                    maid_ref_code_value = maid_ref_code_value.replace(' ',"")
 
                     maidrefcode_list.append(maid_ref_code_value)
                     summary_dict["maid ref code"] = maid_ref_code_value
@@ -434,13 +438,15 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                     pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
             
                     # Replace all characters not matching the pattern with whitespace
-                    maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+                    maid_ref_code_value = re.sub(pattern, '', maid_ref_code_value)
                     
                     # Remove all whitespace from the cleaned string
                     maid_ref_code_value = ''.join(maid_ref_code_value.split())
 
                     # Remove unnecessary leading and trailing spaces
                     maid_ref_code_value = maid_ref_code_value.strip()
+
+                    maid_ref_code_value = maid_ref_code_value.replace(' ',"")
 
                     maidrefcode_list.append(maid_ref_code_value)
                     summary_dict["maid ref code"] = maid_ref_code_value
@@ -451,7 +457,7 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
                 pattern = r'[^0-9A-Z]' # acceptable character are 0 to 9 and all capital letters
         
                 # Replace all characters not matching the pattern with whitespace
-                maid_ref_code_value = re.sub(pattern, ' ', maid_ref_code_value)
+                maid_ref_code_value = re.sub(pattern, '', maid_ref_code_value)
 
                 # Format the birth date by removing slashes
                 formatted_birth_date = birth_date_value.replace("/", "")
@@ -464,6 +470,8 @@ def pdf_to_jpg(pdf_file, output_folder, zoom=2):
 
                 # Remove unnecessary leading and trailing spaces
                 result = result.strip()
+
+                result = result.replace(' ',"")
 
                 # print(result)  # Output should be "JS1234071699"
                 summary_dict["maid ref code"] = result
