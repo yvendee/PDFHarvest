@@ -157,13 +157,23 @@ def save_csv(filename, header, data):
     #     csvfile.write('"' + '","'.join(processed_data2) + '"\n')
 
 
-    ## csv generation for microsoft excel
+    # ## csv generation for microsoft excel
+    # ## Write data to CSV file with UTF-8 BOM
+    # with codecs.open(filename, 'a', 'utf-8-sig') as csvfile:
+    #     if not file_exists:
+    #         csvfile.write('"' + '","'.join(header) + '"\n')
+    #     csvfile.write('"' + '","'.join(processed_data2) + '"\n')
+
     ## Write data to CSV file with UTF-8 BOM
     with codecs.open(filename, 'a', 'utf-8-sig') as csvfile:
         if not file_exists:
             csvfile.write('"' + '","'.join(header) + '"\n')
-        csvfile.write('"' + '","'.join(processed_data2) + '"\n')
-
+        
+        # Extract the first item and join the remaining items with quotes
+        first_item = processed_data2[0]
+        remaining_items = '","'.join(processed_data2[1:])
+        csvfile.write(f'{first_item},"{remaining_items}"\n')
+        
 # # # Example usage:
 # filename = 'example.csv'
 # header = ['Column 1', 'Column 2', 'Column 3']
